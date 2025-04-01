@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/main_item"
+        android:title="@string/app_name">
+        <menu>
+            <item
+                android:id="@+id/Listennow"
+                android:title="Listen Now" />
+            <item
+                android:id="@+id/musiclib"
+                android:title="Music Library" />
+        </menu>
+
+    </item>
+
+    <item
+        android:id="@+id/second_item"
+        android:title="@string/app_name">
+        <menu>
+            <item
+                android:id="@+id/settings"
+                android:title="Settings" />
+            <item
+                android:id="@+id/about"
+                android:title="About" />
+        </menu>
+
+    </item>
+
+</menu>

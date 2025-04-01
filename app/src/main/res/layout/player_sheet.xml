@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <com.amp.nvamp.bottombar.PlayerBottomSheet
+        android:id="@+id/bottom"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:backgroundTint="?attr/colorSurfaceContainer"
+        android:elevation="1dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:behavior_hideable="true"
+        app:marginLeftSystemWindowInsets="false"
+        app:marginRightSystemWindowInsets="false"
+        app:paddingBottomSystemWindowInsets="false"
+        app:layout_behavior=".bottombar.PlayerBottomSheetBehaviour"
+        app:shapeAppearance="@style/BottomPlayerCornerShape"
+        tools:behavior_peekHeight="1000dp"/>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

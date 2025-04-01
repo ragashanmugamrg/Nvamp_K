@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/songs"
+        android:icon="@drawable/ic_songs_foreground"
+        android:title="Songs" />
+    <item
+        android:id="@+id/album"
+        android:icon="@drawable/ic_albums_foreground"
+        android:title="Album" />
+    <item
+        android:id="@+id/search"
+        android:icon="@drawable/ic_search_foreground"
+        android:title="search" />
+
+    <item android:id="@+id/playlistmenus"
+        android:icon="@drawable/ic_playlist_foreground"
+        android:title="Playlist"/>
+    <item
+        android:id="@+id/settings"
+        android:icon="@drawable/ic_settings_foreground"
+        android:title="Settings" />
+</menu>
