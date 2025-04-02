@@ -30,6 +30,7 @@ import com.amp.nvamp.databinding.ActivityMainBinding
 import com.amp.nvamp.fragments.HomeFragment
 import com.amp.nvamp.playback.PlaybackService
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.color.DynamicColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.common.util.concurrent.ListenableFuture
@@ -88,6 +89,7 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        DynamicColors.applyToActivityIfAvailable(this)
         enableEdgeToEdge()
         permissionrequest()
 
