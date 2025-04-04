@@ -7,10 +7,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.amp.nvamp.MainActivity.Companion.deviceMusicByAlbum
 import com.amp.nvamp.MainActivity.Companion.medcontroller
 import com.amp.nvamp.adapter.Albumlistadapter
 import com.amp.nvamp.databinding.FragmentMusicLibraryBinding
+import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByAlbum
 
 class MusicLibrary : Fragment() {
 

@@ -12,7 +12,7 @@ import androidx.media3.session.MediaController
 import androidx.recyclerview.widget.RecyclerView
 import com.amp.nvamp.MainActivity.Companion.customFragmentManager
 import com.amp.nvamp.R
-import com.amp.nvamp.Song
+import com.amp.nvamp.data.Song
 import com.amp.nvamp.fragments.AlbumSongList
 import com.bumptech.glide.Glide
 import com.google.common.util.concurrent.ListenableFuture

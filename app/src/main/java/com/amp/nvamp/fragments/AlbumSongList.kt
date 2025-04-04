@@ -5,17 +5,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.OptIn
 import androidx.fragment.app.Fragment
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.util.UnstableApi
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.amp.nvamp.MainActivity.Companion.deviceMusicByAlbum
-import com.amp.nvamp.MainActivity.Companion.deviceMusicByFolder
 import com.amp.nvamp.MainActivity.Companion.medcontroller
-import com.amp.nvamp.Song
 import com.amp.nvamp.adapter.Songslistadapter
+import com.amp.nvamp.data.Song
 import com.amp.nvamp.databinding.FragmentAlbumSongListBinding
+import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByAlbum
+import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByFolder
 
 
 class AlbumSongList : Fragment() {
@@ -65,13 +67,11 @@ class AlbumSongList : Fragment() {
         adapter = Songslistadapter(listofAlbumsongs, medcontroller)
         libraryListView?.adapter = adapter
 
-
-
-
         return albumsonglistbinding?.root
     }
 
 
+    @OptIn(UnstableApi::class)
     fun changeSongmodeltoMediaitem(listofsongs: List<Song>?): MutableList<MediaItem>{
         var mediasongs = mutableListOf<MediaItem>()
         if (listofsongs!!.isNotEmpty()) {
@@ -82,6 +82,7 @@ class AlbumSongList : Fragment() {
                         MediaMetadata.Builder()
                             .setTitle(data.title)
                             .setArtist(data.artist)
+                            .setDurationMs(data.duration)
                             .setArtworkUri(data.imgUri)
                             .build()
                     )

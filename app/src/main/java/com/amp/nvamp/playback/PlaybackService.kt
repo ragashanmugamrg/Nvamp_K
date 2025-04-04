@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.media.AudioFocusRequest
 import android.media.AudioManager
+import android.media.session.PlaybackState
 import android.util.Log
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
@@ -13,6 +14,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import com.amp.nvamp.NvampApplication
+import com.amp.nvamp.R
 import com.google.common.util.concurrent.ListenableFuture
 
 class PlaybackService : MediaSessionService(),Player.Listener,AudioManager.OnAudioFocusChangeListener {
@@ -53,6 +55,10 @@ class PlaybackService : MediaSessionService(),Player.Listener,AudioManager.OnAud
 
     override fun onPlaybackStateChanged(playbackState: Int) {
         super.onPlaybackStateChanged(playbackState)
+        if (!successfullyRetrievedAudioFocus()){
+
+        }
+
 
     }
 
@@ -61,7 +67,7 @@ class PlaybackService : MediaSessionService(),Player.Listener,AudioManager.OnAud
     }
 
 
-    fun successfullyRetrievedAudioFocus(): Boolean{
+    fun successfullyRetrievedAudioFocus(): Boolean {
         val audioManager: AudioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         var audioAttributes =  android.media.AudioAttributes.Builder()
             .setUsage(android.media.AudioAttributes.USAGE_MEDIA)

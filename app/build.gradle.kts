@@ -60,4 +60,6 @@ dependencies {
     implementation(libs.glide)
     implementation(libs.moshi)
 
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.2")
+
 }

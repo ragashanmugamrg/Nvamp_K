@@ -5,10 +5,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
 import androidx.recyclerview.widget.RecyclerView
 import com.amp.nvamp.R
+import com.amp.nvamp.utils.NvampUtils
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.common.util.concurrent.ListenableFuture
@@ -34,10 +37,15 @@ class Songslistadapter(
     override fun getItemCount(): Int = mediaitems.size
 
 
+    @OptIn(UnstableApi::class)
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         holder.songTitle.text = mediaitems[position].mediaMetadata.title
         holder.songartist.text = mediaitems[position].mediaMetadata.artist
-
+        holder.songDuration.text = mediaitems[position].mediaMetadata.durationMs?.let {
+            NvampUtils().formatDuration(
+                it
+            )
+        }
 
         Glide.with(holder.songalbumart.context)
             .load(mediaitems[position].mediaMetadata.artworkUri)
