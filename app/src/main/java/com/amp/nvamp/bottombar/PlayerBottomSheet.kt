@@ -29,9 +29,12 @@ import com.amp.nvamp.utils.NvampUtils
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.mediaitems
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.slider.Slider
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
@@ -68,6 +71,8 @@ class PlayerBottomSheet(context:Context,attribute:AttributeSet): ConstraintLayou
     var shuffleMode: MaterialButton
     var repeatMode: MaterialButton
 
+    var appBar: MaterialToolbar
+
 
     lateinit var mediaController: ListenableFuture<MediaController>
     lateinit var controller: MediaController
@@ -98,6 +103,7 @@ class PlayerBottomSheet(context:Context,attribute:AttributeSet): ConstraintLayou
 
         leftduration = findViewById(R.id.leftduration)
 
+        appBar = findViewById(R.id.topAppBar)
 
 
     }
@@ -247,18 +253,37 @@ class PlayerBottomSheet(context:Context,attribute:AttributeSet): ConstraintLayou
         }
 
         shuffleMode.setOnClickListener {
-            controller.shuffleModeEnabled = true
-            shuffleMode.setIconResource(R.drawable.shuffle_on_24px)
+            when(controller.shuffleModeEnabled){
+                true ->{
+                    shuffleMode.setIconResource(R.drawable.shuffle_24px)
+                    controller.shuffleModeEnabled = false
+                }
+
+
+                false -> {
+                    shuffleMode.setIconResource(R.drawable.shuffle_on_24px)
+                    controller.shuffleModeEnabled = true
+                }
+            }
         }
+
+
 
         repeatMode.setOnClickListener {
             when(controller.repeatMode){
-                Player.REPEAT_MODE_ONE ->
-                    println("")
-                Player.REPEAT_MODE_ALL ->
-                    println("")
-                Player.REPEAT_MODE_OFF ->
-                    println("")
+                Player.REPEAT_MODE_OFF -> {
+                    repeatMode.setIconResource(R.drawable.repeat_on_24px)
+                    controller.repeatMode = Player.REPEAT_MODE_ALL
+                }
+                Player.REPEAT_MODE_ALL -> {
+                    repeatMode.setIconResource(R.drawable.repeat_one_on_24px)
+                    controller.repeatMode = Player.REPEAT_MODE_ONE
+                }
+                Player.REPEAT_MODE_ONE -> {
+                    repeatMode.setIconResource(R.drawable.repeat_24px)
+                    controller.repeatMode = Player.REPEAT_MODE_OFF
+                }
+
             }
         }
 
@@ -268,6 +293,12 @@ class PlayerBottomSheet(context:Context,attribute:AttributeSet): ConstraintLayou
         slider.addOnChangeListener(Slider.OnChangeListener { slider, value, fromUser ->
             leftduration.text = NvampUtils().formatDuration(value.toLong())
         })
+
+        appBar.setNavigationOnClickListener {
+            MaterialAlertDialogBuilder(context)
+                .setTitle("Add Playlist")
+                .show()
+        }
 
     }
 

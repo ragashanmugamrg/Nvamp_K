@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.OptIn
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
@@ -17,7 +18,10 @@ import com.amp.nvamp.adapter.Songslistadapter
 import com.amp.nvamp.data.Song
 import com.amp.nvamp.databinding.FragmentAlbumSongListBinding
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByAlbum
+import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByArtist
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByFolder
+import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByGener
+import java.io.File
 
 
 class AlbumSongList : Fragment() {
@@ -53,6 +57,12 @@ class AlbumSongList : Fragment() {
         }else if (fromfragmentname == "album"){
             argname = requireArguments().getString("albumname")
             listofsongs = deviceMusicByAlbum.get(argname)
+        }else if(fromfragmentname == "artist"){
+            argname = requireArguments().getString("artistname")
+            listofsongs = deviceMusicByArtist.get(argname)
+        }else if(fromfragmentname == "gener"){
+            argname = requireArguments().getString("genername")
+            listofsongs = deviceMusicByGener.get(argname)
         }
 
 
@@ -77,7 +87,8 @@ class AlbumSongList : Fragment() {
         if (listofsongs!!.isNotEmpty()) {
             listofsongs.forEach { data ->
                 val mediaItem = MediaItem.Builder().setMediaId(data.data)
-                    .setUri(Uri.parse(data.data))
+                    .setUri((data.data.let { it -> File(it) }).toUri())
+                    .setMediaId("MediaStore:$data.id")
                     .setMediaMetadata(
                         MediaMetadata.Builder()
                             .setTitle(data.title)

@@ -5,14 +5,17 @@ import android.net.Uri
 import com.squareup.moshi.Json
 
 data class Song(
-    @Json(name = "title")val title: String,
-    @Json(name = "artist")val artist: String,
-    @Json(name = "duration")val duration: Long?,
-    @Json(name = "data")val data: String,
-    @Json(name = "album")val album: String,
-    @Json(name = "foldername")val foldername: String,
-    @Json(name = "album_id")val album_id: Long,
-    @Json(name = "imgUri")val imgUri: Uri
+    @Json(name = "title") val title: String,
+    @Json(name = "artist") val artist: String,
+    @Json(name = "duration") val duration: Long?,
+    @Json(name = "data") val data: String,
+    @Json(name = "album") val album: String,
+    @Json(name = "foldername") val foldername: String,
+    @Json(name = "album_id") val album_id: Long,
+    @Json(name = "imgUri") val imgUri: Uri,
+    @Json(name = "year") val year: String?,
+    @Json(name = "gener") val gener: String?,
+    @Json(name = "id") val id: String?,
 )
 
 

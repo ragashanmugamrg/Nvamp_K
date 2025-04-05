@@ -8,6 +8,7 @@ import android.media.session.PlaybackState
 import android.util.Log
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
+import androidx.media3.common.C.WakeMode
 import androidx.media3.common.Player
 import androidx.media3.common.Tracks
 import androidx.media3.exoplayer.ExoPlayer
@@ -30,6 +31,7 @@ class PlaybackService : MediaSessionService(),Player.Listener,AudioManager.OnAud
         super.onCreate()
         player = ExoPlayer.Builder(this).build()
         player.addListener(this)
+        player.setWakeMode(C.WAKE_MODE_LOCAL)
         mediaSession = MediaSession.Builder(this, player).build()
     }
 

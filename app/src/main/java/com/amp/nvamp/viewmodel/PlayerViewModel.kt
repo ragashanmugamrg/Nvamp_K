@@ -6,6 +6,7 @@ import android.content.ContentUris
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.annotation.OptIn
+import androidx.core.net.toUri
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.media3.common.MediaItem
@@ -15,6 +16,7 @@ import com.amp.nvamp.NvampApplication
 import com.amp.nvamp.data.Album
 import com.amp.nvamp.data.Song
 import com.amp.nvamp.fragments.HomeFragment
+import java.io.File
 
 class PlayerViewModel(application: Application) : AndroidViewModel(application){
 
@@ -25,6 +27,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application){
         lateinit var deviceMusicByAlbum: Map<String, List<Song>>
         lateinit var deviceMusicByFolder: Map<String, List<Song>>
         lateinit var deviceMusicByArtist: Map<String, List<Song>>
+        lateinit var deviceMusicByGener: Map<String, List<Song>>
         lateinit var customFragmentManager: FragmentManager
     }
 
@@ -35,13 +38,15 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application){
         if(songs.isNotEmpty()){
             songs.forEach{
                 data -> val mediaItem = MediaItem.Builder().setMediaId(data.data)
-                .setUri(Uri.parse(data.data))
+                .setUri((data.data.let { it -> File(it) }).toUri())
+                .setMediaId("MediaStore:$data.id")
                 .setMediaMetadata(
                     MediaMetadata.Builder()
                         .setTitle(data.title)
                         .setArtist(data.artist)
                         .setDurationMs(data.duration)
                         .setArtworkUri(data.imgUri)
+                        .setGenre(data.gener)
                         .build()
                 )
                 mediaitems.add(mediaItem.build())
@@ -59,7 +64,15 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application){
         deviceMusicByFolder = songs.groupBy {
                 it.foldername
         }
-        HomeFragment.playernotify()
+
+        deviceMusicByArtist = songs.groupBy {
+            it.artist
+        }
+
+        deviceMusicByGener = songs.groupBy {
+            it.gener.toString()
+        }
+
     }
 
 
@@ -69,6 +82,9 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application){
 
 
         val album = mutableListOf<Album>()
+
+        val selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0"
+        val sortOrder = MediaStore.Audio.Media.TITLE + " ASC"
 
 
         val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
@@ -80,12 +96,15 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application){
             MediaStore.Audio.Media.ALBUM_ID,
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.DURATION,
-            MediaStore.Audio.Media.DISPLAY_NAME
+            MediaStore.Audio.Media.DISPLAY_NAME,
+            MediaStore.Audio.Media.YEAR,
+            MediaStore.Audio.Media.GENRE,
+            MediaStore.Audio.Media.ALBUM_ARTIST
         )
         val cursor = contentResolver.query(
             uri,
             projection,
-            null,
+            selection,
             null,
             MediaStore.Audio.Media.DEFAULT_SORT_ORDER
         )
@@ -105,8 +124,12 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application){
                 val id = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
                 val duration =
                     cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION))
+                var year =
+                    cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.YEAR))
                 val display_name =
                     cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME))
+                val gener =
+                    cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.GENRE))
                 val foldername = data.replace(display_name, "")
 
                 val artworkUri = Uri.parse("content://media/external/audio/albumart")
@@ -115,17 +138,21 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application){
                     album_id
                 )
 
-                val song = Song(title,artist,duration,data,album,foldername,album_id,imgUri)
+                val pathFile = data?.let { it -> File(it) }
+
+                val song = Song(title,artist,duration,data,album,foldername,album_id,imgUri,year,gener,id)
                 songs.add(song)
 
                 val mediaItem = MediaItem.Builder().setMediaId(data)
-                    .setUri(Uri.parse(data))
+                    .setUri(pathFile?.toUri())
+                    .setMediaId("MediaStore:$id")
                     .setMediaMetadata(
                         MediaMetadata.Builder()
                             .setTitle(title)
                             .setArtist(artist)
                             .setArtworkUri(imgUri)
                             .setDurationMs(duration)
+                            .setGenre(gener)
                             .build()
                     )
 
@@ -139,6 +166,14 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application){
 
         deviceMusicByFolder = songs.groupBy {
             it.foldername
+        }
+
+        deviceMusicByArtist = songs.groupBy {
+            it.artist
+        }
+
+        deviceMusicByGener = songs.groupBy {
+            it.gener.toString()
         }
     }
 

@@ -52,6 +52,17 @@
                     android:icon="@drawable/folder_24px"
                     android:text="@string/folders" />
 
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:icon="@drawable/artist_40px"
+                    android:text="@string/artist" />
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:icon="@drawable/artist_40px"
+                    android:text="@string/gener" />
             </com.google.android.material.tabs.TabLayout>
 
         </com.google.android.material.appbar.AppBarLayout>

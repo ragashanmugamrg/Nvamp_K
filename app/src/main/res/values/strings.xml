@@ -5,4 +5,6 @@
     <string name="albums">Albums</string>
     <string name="folders">Folders</string>
     <string name="songs">Songs</string>
+    <string name="artist">Artist</string>
+    <string name="gener">Gener</string>
 </resources>

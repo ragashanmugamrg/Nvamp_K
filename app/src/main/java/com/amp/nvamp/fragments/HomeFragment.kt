@@ -24,7 +24,7 @@ class HomeFragment : Fragment() {
         }
 
         private fun playernotifyadapter(){
-            if (playerViewModel.songs.isEmpty()){
+            if (adapter != null){
                 adapter.notifyItemRangeChanged(1,12)
             }
         }
@@ -45,8 +45,6 @@ class HomeFragment : Fragment() {
         adapter = Songslistadapter(mediaitems,medcontroller)
         libraryListView?.adapter = adapter
 
-        adapter.notifyItemRangeChanged(1,12)
-        
         return homebinding?.root
     }
 

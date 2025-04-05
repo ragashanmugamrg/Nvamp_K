@@ -42,6 +42,9 @@ class ViewPagerFragment : Fragment() {
                 0 -> "Songs"
                 1 -> "Albums"
                 2 -> "Folder"
+                3 -> "Artist"
+                4 -> "Gener"
+                5 -> "Playlist"
                 else -> "Unknown"
             }
         }.attach()
