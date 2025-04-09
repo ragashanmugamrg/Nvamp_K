@@ -16,6 +16,9 @@ import com.amp.nvamp.NvampApplication
 import com.amp.nvamp.data.Album
 import com.amp.nvamp.data.Song
 import com.amp.nvamp.fragments.HomeFragment
+import com.amp.nvamp.fragments.MusicLibrary
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class PlayerViewModel(application: Application) : AndroidViewModel(application){
@@ -24,68 +27,82 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application){
     companion object{
         var mediaitems = mutableListOf<MediaItem>()
 
-        lateinit var deviceMusicByAlbum: Map<String, List<Song>>
-        lateinit var deviceMusicByFolder: Map<String, List<Song>>
-        lateinit var deviceMusicByArtist: Map<String, List<Song>>
-        lateinit var deviceMusicByGener: Map<String, List<Song>>
+        var deviceMusicByAlbum: Map<String, List<Song>> = mutableMapOf()
+        var deviceMusicByFolder: Map<String, List<Song>> = mapOf()
+        var deviceMusicByArtist: Map<String, List<Song>> = mapOf()
+        var deviceMusicByGener: Map<String, List<Song>> = mapOf()
+
+        var lastPlayedMusic = mutableListOf<MediaItem>()
+        lateinit var playListMusic: Map<String, List<Song>>
+
+        var lastplayedposition: Int = 0
+
         lateinit var customFragmentManager: FragmentManager
     }
 
 
+    fun setlastplayedmedia(lastPlayedMusic: MutableList<MediaItem>){
+        StoragePrefrence().putlastplayed(lastPlayedMusic)
+    }
+
+    fun getlastplayedmedia():MutableList<MediaItem>{
+        return StoragePrefrence().getlastplayed()
+    }
+
+
     @OptIn(UnstableApi::class)
-    fun initialized(){
-        songs = StoragePrefrence().getsongdata()
-        if(songs.isNotEmpty()){
-            songs.forEach{
-                data -> val mediaItem = MediaItem.Builder().setMediaId(data.data)
-                .setUri((data.data.let { it -> File(it) }).toUri())
-                .setMediaId("MediaStore:$data.id")
-                .setMediaMetadata(
-                    MediaMetadata.Builder()
-                        .setTitle(data.title)
-                        .setArtist(data.artist)
-                        .setDurationMs(data.duration)
-                        .setArtworkUri(data.imgUri)
-                        .setGenre(data.gener)
-                        .build()
-                )
-                mediaitems.add(mediaItem.build())
+    suspend  fun initialized(){
+        withContext(Dispatchers.IO){
+            songs = StoragePrefrence().getsongdata()
+            if(songs.isNotEmpty()){
+                songs.forEach{
+                        data -> val mediaItem = MediaItem.Builder().setMediaId(data.data)
+                    .setUri((data.data.let { it -> File(it) }).toUri())
+                    .setMediaId("MediaStore:$data.id")
+                    .setMediaMetadata(
+                        MediaMetadata.Builder()
+                            .setTitle(data.title)
+                            .setArtist(data.artist)
+                            .setDurationMs(data.duration)
+                            .setArtworkUri(data.imgUri)
+                            .setGenre(data.gener)
+                            .build()
+                    )
+                    mediaitems.add(mediaItem.build())
+                }
+            }else{
+                dataIniziser()
+                StoragePrefrence().putsongdata(songs)
             }
-        }else{
-            dataIniziser()
-            StoragePrefrence().putsongdata(songs)
-        }
 
 
+            deviceMusicByAlbum = songs.groupBy {
+                it.album
+            }
 
-        deviceMusicByAlbum = songs
-            .groupBy { it.album }
-
-        deviceMusicByFolder = songs.groupBy {
+            deviceMusicByFolder = songs.groupBy {
                 it.foldername
-        }
+            }
 
-        deviceMusicByArtist = songs.groupBy {
-            it.artist
-        }
+            deviceMusicByArtist = songs.groupBy {
+                it.artist
+            }
 
-        deviceMusicByGener = songs.groupBy {
-            it.gener.toString()
-        }
+            deviceMusicByGener = songs.groupBy {
+                it.gener.toString()
+            }
 
+            lastplayedposition = 0
+       }
     }
 
 
     @OptIn(UnstableApi::class)
     public fun dataIniziser() {
         val contentResolver: ContentResolver = NvampApplication.context.contentResolver
-
-
         val album = mutableListOf<Album>()
-
         val selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0"
         val sortOrder = MediaStore.Audio.Media.TITLE + " ASC"
-
 
         val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         val projection = arrayOf(
@@ -161,8 +178,9 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application){
         }
 
 
-        deviceMusicByAlbum = songs
-            .groupBy { it.album }
+        deviceMusicByAlbum = songs.groupBy {
+                it.album
+        }
 
         deviceMusicByFolder = songs.groupBy {
             it.foldername
@@ -175,6 +193,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application){
         deviceMusicByGener = songs.groupBy {
             it.gener.toString()
         }
+
     }
 
 }

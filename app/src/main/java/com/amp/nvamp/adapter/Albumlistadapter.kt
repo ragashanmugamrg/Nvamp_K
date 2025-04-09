@@ -40,12 +40,13 @@ class Albumlistadapter(
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val albumname = mutableListOf(albumitems.keys)
+        val sortalbumnames = albumname[0].sorted()
         val songs = albumitems.values
-        holder.albumTitle.text = albumname[0].elementAt(position).toString()
+        holder.albumTitle.text = sortalbumnames[position]
         try {
             Glide.with(holder.albumart.context)
                 .load("content://media/external/audio/albumart/"+
-                        albumitems.get(albumname[0].elementAt(position).toString())?.get(0)?.album_id)
+                        albumitems.get(sortalbumnames[position])?.get(0)?.album_id)
                 .placeholder(R.drawable.ic_songs_foreground)
                 .into(holder.albumart)
         }catch (_: Exception){
@@ -54,7 +55,7 @@ class Albumlistadapter(
 
         val bundle = Bundle().apply {
             putInt("position",position)
-            putString("albumname",albumname[0].elementAt(position).toString())
+            putString("albumname",sortalbumnames[position])
             putString("fromfragment","album")
         }
         val albumSongList = AlbumSongList().apply {

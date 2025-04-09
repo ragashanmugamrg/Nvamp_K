@@ -5,27 +5,31 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.media3.common.MediaItem
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.amp.nvamp.MainActivity.Companion.medcontroller
-import com.amp.nvamp.MainActivity.Companion.playerViewModel
 import com.amp.nvamp.adapter.Songslistadapter
 import com.amp.nvamp.databinding.FragmentHomeBinding
+import com.amp.nvamp.fragments.ViewPagerFragment.Companion.loaderview
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.mediaitems
 
 class HomeFragment : Fragment() {
 
-    companion object{
+    companion object {
         var libraryListView: RecyclerView? = null
         lateinit var adapter: Songslistadapter
+        private var musicList = mutableListOf<MediaItem>()
 
-        fun playernotify(){
+        fun playernotify() {
             playernotifyadapter()
+
         }
 
-        private fun playernotifyadapter(){
-            if (adapter != null){
-                adapter.notifyItemRangeChanged(1,12)
+        private fun playernotifyadapter() {
+            if (mediaitems.isNotEmpty()) {
+                musicList.addAll(mediaitems)
+                adapter.notifyItemRangeChanged(1, 12)
             }
         }
     }
@@ -38,11 +42,10 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         homebinding = FragmentHomeBinding.inflate(inflater)
-
         libraryListView = homebinding?.recyclerview
         val layoutManager = LinearLayoutManager(requireContext())
         libraryListView?.layoutManager = layoutManager
-        adapter = Songslistadapter(mediaitems,medcontroller)
+        adapter = Songslistadapter(musicList, medcontroller)
         libraryListView?.adapter = adapter
 
         return homebinding?.root

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.amp.nvamp.R
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
@@ -16,6 +17,10 @@ class ViewPagerFragment : Fragment() {
 
     private lateinit var fragmentContainer: ViewPager2
     private lateinit var tabLayout: TabLayout
+    companion object{
+        lateinit var loaderview: MaterialCardView
+    }
+
 
 
     override fun onCreateView(
@@ -31,6 +36,8 @@ class ViewPagerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         tabLayout = view.findViewById(R.id.tab_layout)
         fragmentContainer = view.findViewById(R.id.fragmentcontainer)
+
+        loaderview = view.findViewById(R.id.loaderview)
 
         fragmentContainer.adapter = com.amp.nvamp.adapter.TabLayout(requireActivity())
 

@@ -10,6 +10,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
 import androidx.recyclerview.widget.RecyclerView
+import com.amp.nvamp.MainActivity.Companion.playerViewModel
 import com.amp.nvamp.R
 import com.amp.nvamp.utils.NvampUtils
 import com.bumptech.glide.Glide
@@ -59,6 +60,7 @@ class Songslistadapter(
                 controller.setMediaItems(mediaitems,position,0)
                 controller.play()
             }
+
         }
 
     }
