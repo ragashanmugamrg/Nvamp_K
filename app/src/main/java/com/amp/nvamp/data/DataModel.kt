@@ -30,3 +30,8 @@ data class Artist(
     val artist: String,
     val songList: List<Song>
 )
+
+data class Playlistdata(
+    @Json val title: String,
+    @Json val songid: String?
+)

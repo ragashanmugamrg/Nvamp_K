@@ -14,6 +14,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.amp.nvamp.MainActivity.Companion.medcontroller
+import com.amp.nvamp.MainActivity.Companion.playerViewModel
 import com.amp.nvamp.adapter.Songslistadapter
 import com.amp.nvamp.data.Song
 import com.amp.nvamp.databinding.FragmentAlbumSongListBinding
@@ -63,6 +64,10 @@ class AlbumSongList : Fragment() {
         }else if(fromfragmentname == "gener"){
             argname = requireArguments().getString("genername")
             listofsongs = deviceMusicByGener.get(argname)
+        }else if(fromfragmentname == "playlist"){
+            argname = requireArguments().getString("playlistname")
+            val deviceMusicByPlaylist = playerViewModel.getplayListMusic()
+            listofsongs = deviceMusicByPlaylist.get(argname)
         }
 
 
@@ -84,6 +89,7 @@ class AlbumSongList : Fragment() {
     @OptIn(UnstableApi::class)
     fun changeSongmodeltoMediaitem(listofsongs: List<Song>?): MutableList<MediaItem>{
         var mediasongs = mutableListOf<MediaItem>()
+        playerViewModel.setlastplayedmedia(listofsongs!!.toMutableList())
         if (listofsongs!!.isNotEmpty()) {
             listofsongs.forEach { data ->
                 val mediaItem = MediaItem.Builder().setMediaId(data.data)
@@ -95,6 +101,7 @@ class AlbumSongList : Fragment() {
                             .setArtist(data.artist)
                             .setDurationMs(data.duration)
                             .setArtworkUri(data.imgUri)
+                            .setDescription(data.data)
                             .build()
                     )
                 mediasongs.add(mediaItem.build())

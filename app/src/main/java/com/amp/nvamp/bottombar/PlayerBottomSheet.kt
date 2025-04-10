@@ -4,6 +4,7 @@ package com.amp.nvamp.bottombar
 import android.content.ComponentName
 import android.content.Context
 import android.content.DialogInterface
+import android.net.Uri
 import android.util.AttributeSet
 import android.view.View
 import android.widget.EditText
@@ -18,8 +19,11 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.amp.nvamp.MainActivity
+import com.amp.nvamp.MainActivity.Companion.playerViewModel
 import com.amp.nvamp.NvampApplication
 import com.amp.nvamp.R
+import com.amp.nvamp.data.Playlistdata
+import com.amp.nvamp.data.Song
 import com.amp.nvamp.playback.PlaybackService
 import com.amp.nvamp.utils.NvampUtils
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.mediaitems
@@ -74,6 +78,8 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
     lateinit var mediaController: ListenableFuture<MediaController>
     lateinit var controller: MediaController
 
+    val playlistmap = mutableMapOf<String,List<Song>>()
+    val dynamicChoice: Set<String> = playlistmap.keys
 
     init {
         inflate(context, R.layout.player_bottom_sheet, this)
@@ -101,6 +107,7 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
 
         appBar = findViewById(R.id.topAppBar)
 
+        playlistmap.putAll(playerViewModel.getplayListMusic())
 
     }
 
@@ -296,7 +303,14 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
 
 
 
+
         appBar.setOnMenuItemClickListener { item ->
+
+            var playlistnames = mutableListOf<String>()
+            dynamicChoice.forEach { name ->
+                playlistnames.add(name)
+            }
+
             if (item.title == "favorite") {
                 MaterialAlertDialogBuilder(context)
                     .setTitle("Save")
@@ -309,18 +323,63 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
                                 dialog.dismiss()
                             }
                             .setPositiveButton("ok") { dialog, which ->
-                                dialog.dismiss()
+                                val playlistname = editText.text
+                                val playlist = Song(
+                                controller.mediaMetadata.title.toString(),
+                                controller.mediaMetadata.artist.toString(),
+                                controller.duration,
+                                    controller.mediaMetadata.description.toString(),
+                                "",
+                                "",
+                                0L,
+                                controller.mediaMetadata.artworkUri!!,
+                                "",
+                                "",
+                                    controller.mediaMetadata.description.toString(),
+                            )
+                                var newplaylist = mutableListOf<Song>()
+                                newplaylist.add(playlist)
+                                playlistmap.put(playlistname.toString(),newplaylist)
+                                playerViewModel.setplayListMusic(playlistmap)
                             }
                             .show()
                     }
                     .setNegativeButton("cancle") { dialog, which ->
                         dialog.dismiss()
                     }
-                    .setPositiveButton("ok",
-                        DialogInterface.OnClickListener { dialog: DialogInterface?, which: Int ->
+                    .setPositiveButton("ok",{ dialog: DialogInterface?, which: Int ->
 
                         })
+                    .setMultiChoiceItems(playlistnames.toTypedArray(),null,){ dialog,which,ischecked ->
+                        val selectedItem = playlistnames[which]
+                        if(ischecked) {
+                            val playlist = Song(
+                                controller.mediaMetadata.title.toString(),
+                                controller.mediaMetadata.artist.toString(),
+                                controller.duration,
+                                controller.mediaMetadata.description.toString(),
+                                "",
+                                "",
+                                0L,
+                                controller.mediaMetadata.artworkUri!!,
+                                "",
+                                "",
+                                controller.mediaMetadata.description.toString(),
+                            )
+                            var newplaylist = mutableListOf<Song>()
+                            val play = playlistmap.get(selectedItem)?.toMutableList()
+                            if (play!=null){
+                                play.forEach { data ->
+                                    newplaylist.add(data)
+                                }
+                            }
+                            newplaylist.add(playlist)
+                            playlistmap.put(selectedItem,newplaylist)
+                            playerViewModel.setplayListMusic(playlistmap)
+                        }
+                    }
                     .show()
+
                 return@setOnMenuItemClickListener true
             } else {
                 return@setOnMenuItemClickListener false

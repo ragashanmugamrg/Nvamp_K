@@ -26,6 +26,7 @@ import com.amp.nvamp.fragments.HomeFragment
 import com.amp.nvamp.fragments.MusicLibrary
 import com.amp.nvamp.fragments.ViewPagerFragment.Companion.loaderview
 import com.amp.nvamp.playback.PlaybackService
+import com.amp.nvamp.utils.NvampUtils
 import com.amp.nvamp.viewmodel.PlayerViewModel
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.mediaitems
 import com.google.android.material.color.DynamicColors
@@ -73,6 +74,7 @@ class MainActivity : AppCompatActivity() {
 
 
         var lastplayedmedias = playerViewModel.getlastplayedmedia()
+        var lastplayedpos = playerViewModel.getlastplayedpos()
 
         setContentView(R.layout.activity_main)
 
@@ -87,7 +89,7 @@ class MainActivity : AppCompatActivity() {
             {
                 if (medcontroller.isDone) {
                     controller = medcontroller.get()
-                    controller.setMediaItems(lastplayedmedias)
+                    controller.setMediaItems(NvampUtils().changeSongmodeltoMediaitem(lastplayedmedias),lastplayedpos,0)
                 }
             }, MoreExecutors.directExecutor()
         )

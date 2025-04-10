@@ -4,7 +4,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.media3.common.MediaItem
 import com.amp.nvamp.NvampApplication
+import com.amp.nvamp.data.Playlistdata
 import com.amp.nvamp.data.Song
+import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -39,19 +41,46 @@ class StoragePrefrence {
         return sp!!.getInt("lastplayedpos", 0)
     }
 
+    fun putplayListMusic(value: Map<String, List<Song>>?) {
+        val jsonAdapter = moshi?.adapter(Map::class.java)
+        val json = jsonAdapter?.toJson(value)
+        sp!!.edit().putString("playlist", json).apply()
+    }
 
-    fun putlastplayed(value: MutableList<MediaItem>?) {
-        val jsonAdapter = types?.let { moshi?.adapter<List<MediaItem>>(it) }
+
+    fun getplayListMusic(): Map<String, List<Song>> {
+        val json = sp!!.getString("playlist", null)
+        if (json != null) {
+            try {
+                val type = Types.newParameterizedType(
+                    Map::class.java,
+                    String::class.java,
+                    Types.newParameterizedType(List::class.java, Song::class.java)
+                )
+
+                val jsonAdapter: JsonAdapter<Map<String, List<Song>>> = moshi!!.adapter(type)
+                return jsonAdapter.fromJson(json) ?: emptyMap()
+            } catch (e: IOException) {
+                throw RuntimeException(e)
+            }
+        }
+        return emptyMap()
+    }
+
+
+    fun putlastplayed(value: MutableList<Song>?) {
+        val jsonAdapter =
+            types?.let { moshi?.adapter<List<Song>>(it) }
         val json = jsonAdapter?.toJson(value)
         sp!!.edit().putString("lastsongdata", json).apply()
     }
 
 
-    fun getlastplayed(): MutableList<MediaItem> {
+    fun getlastplayed(): MutableList<Song> {
         val json = sp!!.getString("lastsongdata", null)
         if (json != null) {
             try {
-                val jsonAdapter = types?.let { moshi?.adapter<List<MediaItem>>(it) }
+                val jsonAdapter = types?.let { moshi?.adapter<List<Song>>(it) }
                 return (jsonAdapter?.fromJson(json) ?: mutableListOf()).toMutableList()
             } catch (e: IOException) {
                 throw RuntimeException(e)

@@ -59,6 +59,7 @@ class Songslistadapter(
                 var controller = medcontroller.get()
                 controller.setMediaItems(mediaitems,position,0)
                 controller.play()
+                playerViewModel.setlastplayedpos(position)
             }
 
         }

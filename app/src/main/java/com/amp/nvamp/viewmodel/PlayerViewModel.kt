@@ -14,6 +14,7 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
 import com.amp.nvamp.NvampApplication
 import com.amp.nvamp.data.Album
+import com.amp.nvamp.data.Playlistdata
 import com.amp.nvamp.data.Song
 import com.amp.nvamp.fragments.HomeFragment
 import com.amp.nvamp.fragments.MusicLibrary
@@ -33,20 +34,38 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application){
         var deviceMusicByGener: Map<String, List<Song>> = mapOf()
 
         var lastPlayedMusic = mutableListOf<MediaItem>()
-        lateinit var playListMusic: Map<String, List<Song>>
+        var playListMusic: Map<String, List<Song>> = mutableMapOf()
 
         var lastplayedposition: Int = 0
 
         lateinit var customFragmentManager: FragmentManager
     }
 
+    fun setlastplayedpos(value: Int){
+        StoragePrefrence().putLastplayedpos(value)
+    }
 
-    fun setlastplayedmedia(lastPlayedMusic: MutableList<MediaItem>){
+    fun getlastplayedpos(): Int{
+        return StoragePrefrence().getLastplayedpos()
+    }
+
+
+    fun setlastplayedmedia(lastPlayedMusic: MutableList<Song>){
         StoragePrefrence().putlastplayed(lastPlayedMusic)
     }
 
-    fun getlastplayedmedia():MutableList<MediaItem>{
+    fun getlastplayedmedia():MutableList<Song>{
         return StoragePrefrence().getlastplayed()
+    }
+
+
+    fun setplayListMusic(lastPlayedMusic: Map<String, List<Song>>){
+        playListMusic = lastPlayedMusic
+        StoragePrefrence().putplayListMusic(lastPlayedMusic)
+    }
+
+    fun getplayListMusic(): Map<String, List<Song>>{
+        return StoragePrefrence().getplayListMusic()
     }
 
 
@@ -66,6 +85,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application){
                             .setDurationMs(data.duration)
                             .setArtworkUri(data.imgUri)
                             .setGenre(data.gener)
+                            .setDescription(data.data)
                             .build()
                     )
                     mediaitems.add(mediaItem.build())
@@ -170,6 +190,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application){
                             .setArtworkUri(imgUri)
                             .setDurationMs(duration)
                             .setGenre(gener)
+                            .setDescription(data)
                             .build()
                     )
 
