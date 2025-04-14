@@ -4,7 +4,8 @@ package com.amp.nvamp.bottombar
 import android.content.ComponentName
 import android.content.Context
 import android.content.DialogInterface
-import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
 import android.view.View
 import android.widget.EditText
@@ -20,9 +21,9 @@ import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.amp.nvamp.MainActivity
 import com.amp.nvamp.MainActivity.Companion.playerViewModel
+import com.amp.nvamp.MainActivity.Companion.ahandler
 import com.amp.nvamp.NvampApplication
 import com.amp.nvamp.R
-import com.amp.nvamp.data.Playlistdata
 import com.amp.nvamp.data.Song
 import com.amp.nvamp.playback.PlaybackService
 import com.amp.nvamp.utils.NvampUtils
@@ -109,6 +110,8 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
 
         playlistmap.putAll(playerViewModel.getplayListMusic())
 
+        val handler = Handler(Looper.getMainLooper())
+
     }
 
 
@@ -137,13 +140,12 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
         }
     }
 
-
     var seekbarplayer = object : Runnable {
         override fun run() {
             if (controller.isPlaying) {
                 slider.value = controller.currentPosition.toFloat()
             }
-            handler.postDelayed(this, 500)
+            ahandler.postDelayed(this, 500)
         }
     }
 
@@ -183,7 +185,7 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
                         override fun onIsPlayingChanged(isPlaying: Boolean) {
                             super.onIsPlayingChanged(isPlaying)
                             onPlaybackStateChanged(controller.playbackState)
-                            handler.postDelayed(seekbarplayer, 500)
+                            ahandler.postDelayed(seekbarplayer, 500)
                         }
 
                         override fun onPlaybackStateChanged(playbackState: Int) {
@@ -198,9 +200,8 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
 
                         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                             super.onMediaItemTransition(mediaItem, reason)
-                            println("hello")
                             slider.value = 0f
-                            handler.postDelayed(seekbarplayer, 500)
+                            ahandler.postDelayed(seekbarplayer, 500)
                         }
 
                     })

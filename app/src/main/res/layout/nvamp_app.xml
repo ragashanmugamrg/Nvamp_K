@@ -1,0 +1,53 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Widget.Nvamp.AppWidget.Container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    android:theme="@style/Theme.Nvamp.AppWidgetContainer">
+
+
+    <FrameLayout
+        android:id="@+id/materialCardView"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:background="@drawable/rounded_backround"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <ImageButton
+            android:id="@+id/widgetbutton"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:insetRight="0dp"
+            android:background="@drawable/rounded_backround_button"
+            android:insetBottom="0dp"
+            android:layout_gravity="start|center|bottom"
+            app:backgroundTint="?attr/colorSecondaryContainer"
+            android:src="@drawable/play_arrow_40px"/>
+
+
+        <ImageButton
+            android:id="@+id/widgetbuttonnext"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:background="@drawable/rounded_backround_button"
+            android:insetRight="0dp"
+            android:insetBottom="0dp"
+            android:layout_gravity="end|center|top"
+            app:backgroundTint="?attr/colorSecondaryContainer"
+            android:src="@drawable/play_arrow_40px"/>
+
+
+    </FrameLayout>
+
+
+</RelativeLayout>

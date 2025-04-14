@@ -76,7 +76,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application){
             if(songs.isNotEmpty()){
                 songs.forEach{
                         data -> val mediaItem = MediaItem.Builder().setMediaId(data.data)
-                    .setUri((data.data.let { it -> File(it) }).toUri())
+                    .setUri((data.data.let { File(it) }).toUri())
                     .setMediaId("MediaStore:$data.id")
                     .setMediaMetadata(
                         MediaMetadata.Builder()

@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         lateinit var medcontroller: ListenableFuture<MediaController>
         lateinit var customFragmentManager: FragmentManager
-        private val handler: Handler = Handler(Looper.getMainLooper())
+        val ahandler: Handler = Handler(Looper.getMainLooper())
         lateinit var playerViewModel: PlayerViewModel
     }
 
@@ -76,6 +76,7 @@ class MainActivity : AppCompatActivity() {
         var lastplayedmedias = playerViewModel.getlastplayedmedia()
         var lastplayedpos = playerViewModel.getlastplayedpos()
 
+
         setContentView(R.layout.activity_main)
 
         customFragmentManager = supportFragmentManager
@@ -89,11 +90,10 @@ class MainActivity : AppCompatActivity() {
             {
                 if (medcontroller.isDone) {
                     controller = medcontroller.get()
-                    controller.setMediaItems(NvampUtils().changeSongmodeltoMediaitem(lastplayedmedias),lastplayedpos,0)
+                    controller.setMediaItems(mediaitems)
                 }
             }, MoreExecutors.directExecutor()
         )
-
     }
 
 
@@ -123,6 +123,21 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
+    }
+
+
+    override fun onPause() {
+        super.onPause()
+        medcontroller.cancel(true)
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+        medcontroller = MediaController.Builder(
+            this,
+            SessionToken(this, ComponentName(this, PlaybackService::class.java)),
+        ).buildAsync()
     }
 
     override fun onRequestPermissionsResult(
