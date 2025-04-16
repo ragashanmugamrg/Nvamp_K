@@ -10,14 +10,77 @@
     tools:context=".MiniplayerActivity">
 
 
-  <ImageButton
-      android:layout_width="200dp"
+  <androidx.constraintlayout.widget.ConstraintLayout
+      android:id="@+id/miniimage"
+      android:layout_width="match_parent"
       android:layout_height="200dp"
-      android:background="@drawable/rounded_backround"
-      android:src="@drawable/play_arrow_40px"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintBottom_toBottomOf="parent"
+      android:background="@color/white"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent"/>
+      app:layout_constraintTop_toTopOf="parent"
+      android:layout_marginHorizontal="10dp"
+      app:layout_constraintBottom_toBottomOf="parent">
+
+      <ImageView
+          android:id="@+id/imageView3"
+          android:layout_width="100dp"
+          android:layout_height="100dp"
+          android:layout_marginHorizontal="10dp"
+          android:layout_marginVertical="10dp"
+          android:src="@drawable/ic_songs_foreground"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent" />
+
+      <LinearLayout
+          android:id="@+id/details"
+          android:layout_width="243dp"
+          android:layout_height="102dp"
+          android:layout_gravity="center_vertical"
+          android:layout_marginHorizontal="10dp"
+          android:layout_marginVertical="10dp"
+          android:orientation="vertical"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toEndOf="@+id/imageView3"
+          app:layout_constraintTop_toTopOf="parent">
+
+          <TextView
+              android:id="@+id/title"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:ellipsize="marquee"
+              android:marqueeRepeatLimit="marquee_forever"
+              android:singleLine="true"
+              android:text="Title"
+              android:textColor="?attr/colorAccent"
+              android:textSize="20sp"
+              android:textStyle="bold" />
+
+          <TextView
+              android:id="@+id/artist"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:ellipsize="marquee"
+              android:marqueeRepeatLimit="marquee_forever"
+              android:singleLine="true"
+              android:text="Artist"
+              android:textColor="?attr/colorAccent"
+              android:textSize="14sp" />
+
+      </LinearLayout>
+
+
+
+      <SeekBar
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="50dp"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+
+
+
+  </androidx.constraintlayout.widget.ConstraintLayout>
 
   </androidx.constraintlayout.widget.ConstraintLayout>
