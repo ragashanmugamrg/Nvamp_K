@@ -149,7 +149,8 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             MediaStore.Audio.Media.YEAR,
             MediaStore.Audio.Media.GENRE,
             MediaStore.Audio.Media.ALBUM_ARTIST,
-            MediaStore.Audio.Media.DATE_ADDED
+            MediaStore.Audio.Media.DATE_ADDED,
+            MediaStore.Audio.Media.DATE_MODIFIED
         )
         val cursor = contentResolver.query(
             uri,
@@ -180,8 +181,12 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
                     cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME))
                 val gener =
                     cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.GENRE))
-                val adddate =
+                var adddate =
                     cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED))
+
+                if (adddate == 0)
+                    adddate = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED))
+
                 val foldername = data.replace(display_name, "")
 
                 val artworkUri = Uri.parse("content://media/external/audio/albumart")
@@ -245,9 +250,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             .toMutableList()
 
 
-        deviceMusicByGener = songs.groupBy {
-            it.gener.toString()
-        }
+        deviceMusicByGener = songs.groupBy { it.gener.toString() }
     }
 
 }
