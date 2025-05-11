@@ -1,6 +1,5 @@
 package com.amp.nvamp.fragments
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +19,7 @@ import com.amp.nvamp.data.Song
 import com.amp.nvamp.databinding.FragmentAlbumSongListBinding
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByAlbum
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByArtist
+import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByDate
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByFolder
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByGener
 import java.io.File
@@ -68,6 +68,9 @@ class AlbumSongList : Fragment() {
             argname = requireArguments().getString("playlistname")
             val deviceMusicByPlaylist = playerViewModel.getplayListMusic()
             listofsongs = deviceMusicByPlaylist.get(argname)
+        }else if(fromfragmentname == "Recently Added"){
+            argname = requireArguments().getString("playlistname")
+            listofsongs = deviceMusicByDate
         }
 
 

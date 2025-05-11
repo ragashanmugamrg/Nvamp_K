@@ -22,6 +22,9 @@ import androidx.media3.session.MediaBrowser
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.amp.nvamp.databinding.ActivityMainBinding
+import com.amp.nvamp.fragments.ArtistFragment
+import com.amp.nvamp.fragments.FolderFragment
+import com.amp.nvamp.fragments.GenerFragment
 import com.amp.nvamp.fragments.HomeFragment
 import com.amp.nvamp.fragments.MusicLibrary
 import com.amp.nvamp.fragments.ViewPagerFragment.Companion.loaderview
@@ -70,6 +73,9 @@ class MainActivity : AppCompatActivity() {
             PlayerViewModel(application).initialized()
             HomeFragment.playernotify()
             MusicLibrary.playernotify()
+            FolderFragment.playernotify()
+            ArtistFragment.playernotify()
+            GenerFragment.playernotify()
         }
 
 
@@ -146,12 +152,14 @@ class MainActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
         coroutineScope.launch {
             loaderview.visibility = VISIBLE
             PlayerViewModel(application).initialized()
             HomeFragment.playernotify()
             MusicLibrary.playernotify()
+            FolderFragment.playernotify()
+            ArtistFragment.playernotify()
+            GenerFragment.playernotify()
             loaderview.visibility = GONE
         }
     }

@@ -5,6 +5,8 @@ import android.media.audiofx.AudioEffect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -12,6 +14,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.amp.nvamp.MainActivity
 import com.amp.nvamp.MainActivity.Companion.medcontroller
 import com.amp.nvamp.R
+import com.amp.nvamp.adapter.Folderlistadapter
 import com.amp.nvamp.playback.PlaybackService.Companion.sessionId
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.card.MaterialCardView
@@ -52,7 +55,7 @@ class ViewPagerFragment : Fragment() {
 
         fragmentContainer.adapter = com.amp.nvamp.adapter.TabLayout(requireActivity())
 
-        fragmentContainer.offscreenPageLimit = 1
+        fragmentContainer.offscreenPageLimit = 6
 
         TabLayoutMediator(tabLayout,fragmentContainer){
                 tab, position ->
@@ -71,7 +74,15 @@ class ViewPagerFragment : Fragment() {
         toolbar.setOnMenuItemClickListener { menuItem ->
             if (menuItem.title == "Refresh"){
                 lifecycleScope.launch {
-                    MainActivity.playerViewModel.initialized()
+                    loaderview.visibility = VISIBLE
+                    MainActivity.playerViewModel.refreshdatainpref()
+                    HomeFragment.playernotify()
+                    MusicLibrary.playernotify()
+                    FolderFragment.playernotify()
+                    ArtistFragment.playernotify()
+                    GenerFragment.playernotify()
+                    PlaylistFragment.playernotify()
+                    loaderview.visibility = GONE
                 }
                 return@setOnMenuItemClickListener true
             }else if (menuItem.title == "Settings"){
@@ -84,7 +95,6 @@ class ViewPagerFragment : Fragment() {
                 }
 
                 requireContext().startActivity(intent)
-
 
                 return@setOnMenuItemClickListener true
             }

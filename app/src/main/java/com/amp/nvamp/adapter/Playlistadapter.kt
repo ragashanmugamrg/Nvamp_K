@@ -40,13 +40,23 @@ class Playlistadapter(
         holder.nooftracks.text = playlistitems.get(foldername[0].elementAt(position))?.size.toString()+" Items"
 
         val bundle = Bundle().apply {
-            putInt("position",position)
-            putString("playlistname",foldername[0].elementAt(position).toString())
-            putString("fromfragment","playlist")
+
+            if (holder.title.text == "Recently Added"){
+                putInt("position",position)
+                putString("playlistname",foldername[0].elementAt(position).toString())
+                putString("fromfragment","Recently Added")
+            }else{
+                putInt("position",position)
+                putString("playlistname",foldername[0].elementAt(position).toString())
+                putString("fromfragment","playlist")
+            }
+
         }
         val folderSongList = AlbumSongList().apply {
             arguments = bundle
         }
+
+
 
         holder.itemView.setOnClickListener {
             customFragmentManager.beginTransaction().replace(R.id.fragmentcontainer,folderSongList)

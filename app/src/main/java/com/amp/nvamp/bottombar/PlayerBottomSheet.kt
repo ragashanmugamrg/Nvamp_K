@@ -25,6 +25,7 @@ import com.amp.nvamp.MainActivity.Companion.ahandler
 import com.amp.nvamp.NvampApplication
 import com.amp.nvamp.R
 import com.amp.nvamp.data.Song
+import com.amp.nvamp.fragments.PlaylistFragment
 import com.amp.nvamp.playback.PlaybackService
 import com.amp.nvamp.utils.NvampUtils
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.mediaitems
@@ -337,11 +338,13 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
                                 "",
                                 "",
                                     controller.mediaMetadata.description.toString(),
+                                0,
                             )
                                 var newplaylist = mutableListOf<Song>()
                                 newplaylist.add(playlist)
                                 playlistmap.put(playlistname.toString(),newplaylist)
                                 playerViewModel.setplayListMusic(playlistmap)
+                                PlaylistFragment.playernotify()
                             }
                             .show()
                     }
@@ -349,7 +352,7 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
                         dialog.dismiss()
                     }
                     .setPositiveButton("ok",{ dialog: DialogInterface?, which: Int ->
-
+                        PlaylistFragment.playernotify()
                         })
                     .setMultiChoiceItems(playlistnames.toTypedArray(),null,){ dialog,which,ischecked ->
                         val selectedItem = playlistnames[which]
@@ -366,6 +369,7 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
                                 "",
                                 "",
                                 controller.mediaMetadata.description.toString(),
+                                0,
                             )
                             var newplaylist = mutableListOf<Song>()
                             val play = playlistmap.get(selectedItem)?.toMutableList()

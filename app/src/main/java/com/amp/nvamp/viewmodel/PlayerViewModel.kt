@@ -14,24 +14,24 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
 import com.amp.nvamp.NvampApplication
 import com.amp.nvamp.data.Album
-import com.amp.nvamp.data.Playlistdata
 import com.amp.nvamp.data.Song
-import com.amp.nvamp.fragments.HomeFragment
-import com.amp.nvamp.fragments.MusicLibrary
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 
-class PlayerViewModel(application: Application) : AndroidViewModel(application){
+class PlayerViewModel(application: Application) : AndroidViewModel(application) {
 
     var songs = mutableListOf<Song>()
-    companion object{
+
+    companion object {
         var mediaitems = mutableListOf<MediaItem>()
 
         var deviceMusicByAlbum: Map<String, List<Song>> = mutableMapOf()
-        var deviceMusicByFolder: Map<String, List<Song>> = mapOf()
-        var deviceMusicByArtist: Map<String, List<Song>> = mapOf()
-        var deviceMusicByGener: Map<String, List<Song>> = mapOf()
+        var deviceMusicByFolder: Map<String, List<Song>> = mutableMapOf()
+        var deviceMusicByArtist: Map<String, List<Song>> = mutableMapOf()
+        var deviceMusicByGener: Map<String, List<Song>> = mutableMapOf()
+
+        var deviceMusicByDate: MutableList<Song> = mutableListOf()
 
         var lastPlayedMusic = mutableListOf<MediaItem>()
         var playListMusic: Map<String, List<Song>> = mutableMapOf()
@@ -41,56 +41,64 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application){
         lateinit var customFragmentManager: FragmentManager
     }
 
-    fun setlastplayedpos(value: Int){
+    fun setlastplayedpos(value: Int) {
         StoragePrefrence().putLastplayedpos(value)
     }
 
-    fun getlastplayedpos(): Int{
+    fun getlastplayedpos(): Int {
         return StoragePrefrence().getLastplayedpos()
     }
 
 
-    fun setlastplayedmedia(lastPlayedMusic: MutableList<Song>){
+    fun setlastplayedmedia(lastPlayedMusic: MutableList<Song>) {
         StoragePrefrence().putlastplayed(lastPlayedMusic)
     }
 
-    fun getlastplayedmedia():MutableList<Song>{
+    fun getlastplayedmedia(): MutableList<Song> {
         return StoragePrefrence().getlastplayed()
     }
 
 
-    fun setplayListMusic(lastPlayedMusic: Map<String, List<Song>>){
+    fun setplayListMusic(lastPlayedMusic: Map<String, List<Song>>) {
         playListMusic = lastPlayedMusic
         StoragePrefrence().putplayListMusic(lastPlayedMusic)
     }
 
-    fun getplayListMusic(): Map<String, List<Song>>{
+    fun getplayListMusic(): Map<String, List<Song>> {
         return StoragePrefrence().getplayListMusic()
+    }
+
+    @OptIn(UnstableApi::class)
+    suspend fun refreshdatainpref() {
+        withContext(Dispatchers.IO) {
+            dataIniziser()
+            StoragePrefrence().putsongdata(songs)
+        }
     }
 
 
     @OptIn(UnstableApi::class)
-    suspend  fun initialized(){
-        withContext(Dispatchers.IO){
+    suspend fun initialized() {
+        withContext(Dispatchers.IO) {
             songs = StoragePrefrence().getsongdata()
-            if(songs.isNotEmpty()){
-                songs.forEach{
-                        data -> val mediaItem = MediaItem.Builder().setMediaId(data.data)
-                    .setUri((data.data.let { File(it) }).toUri())
-                    .setMediaId("MediaStore:$data.id")
-                    .setMediaMetadata(
-                        MediaMetadata.Builder()
-                            .setTitle(data.title)
-                            .setArtist(data.artist)
-                            .setDurationMs(data.duration)
-                            .setArtworkUri(data.imgUri)
-                            .setGenre(data.gener)
-                            .setDescription(data.data)
-                            .build()
-                    )
+            if (songs.isNotEmpty()) {
+                songs.forEach { data ->
+                    val mediaItem = MediaItem.Builder().setMediaId(data.data)
+                        .setUri((data.data.let { File(it) }).toUri())
+                        .setMediaId("MediaStore:$data.id")
+                        .setMediaMetadata(
+                            MediaMetadata.Builder()
+                                .setTitle(data.title)
+                                .setArtist(data.artist)
+                                .setDurationMs(data.duration)
+                                .setArtworkUri(data.imgUri)
+                                .setGenre(data.gener)
+                                .setDescription(data.data)
+                                .build()
+                        )
                     mediaitems.add(mediaItem.build())
                 }
-            }else{
+            } else {
                 dataIniziser()
                 StoragePrefrence().putsongdata(songs)
             }
@@ -112,13 +120,17 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application){
                 it.gener.toString()
             }
 
+            deviceMusicByDate = songs
+                .sortedByDescending { it.date }
+                .toMutableList()
+
             lastplayedposition = 0
-       }
+        }
     }
 
 
     @OptIn(UnstableApi::class)
-    public fun dataIniziser() {
+    fun dataIniziser() {
         val contentResolver: ContentResolver = NvampApplication.context.contentResolver
         val album = mutableListOf<Album>()
         val selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0"
@@ -136,7 +148,8 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application){
             MediaStore.Audio.Media.DISPLAY_NAME,
             MediaStore.Audio.Media.YEAR,
             MediaStore.Audio.Media.GENRE,
-            MediaStore.Audio.Media.ALBUM_ARTIST
+            MediaStore.Audio.Media.ALBUM_ARTIST,
+            MediaStore.Audio.Media.DATE_ADDED
         )
         val cursor = contentResolver.query(
             uri,
@@ -167,6 +180,8 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application){
                     cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME))
                 val gener =
                     cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.GENRE))
+                val adddate =
+                    cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED))
                 val foldername = data.replace(display_name, "")
 
                 val artworkUri = Uri.parse("content://media/external/audio/albumart")
@@ -175,9 +190,24 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application){
                     album_id
                 )
 
+                println(adddate)
+
                 val pathFile = data?.let { it -> File(it) }
 
-                val song = Song(title,artist,duration,data,album,foldername,album_id,imgUri,year,gener,id)
+                val song = Song(
+                    title,
+                    artist,
+                    duration,
+                    data,
+                    album,
+                    foldername,
+                    album_id,
+                    imgUri,
+                    year,
+                    gener,
+                    id,
+                    adddate
+                )
                 songs.add(song)
 
                 val mediaItem = MediaItem.Builder().setMediaId(data)
@@ -200,7 +230,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application){
 
 
         deviceMusicByAlbum = songs.groupBy {
-                it.album
+            it.album
         }
 
         deviceMusicByFolder = songs.groupBy {
@@ -211,10 +241,13 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application){
             it.artist
         }
 
+        deviceMusicByDate = songs.sortedByDescending { it.date }
+            .toMutableList()
+
+
         deviceMusicByGener = songs.groupBy {
             it.gener.toString()
         }
-
     }
 
 }

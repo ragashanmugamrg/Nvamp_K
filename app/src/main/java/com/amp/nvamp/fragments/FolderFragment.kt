@@ -9,14 +9,33 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.amp.nvamp.MainActivity.Companion.medcontroller
 import com.amp.nvamp.adapter.Folderlistadapter
+import com.amp.nvamp.data.Song
 import com.amp.nvamp.databinding.FragmentFolderBinding
+import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByAlbum
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByFolder
 
 
 class FolderFragment : Fragment() {
 
-    private lateinit var folderbinding: FragmentFolderBinding
-    var folderListView: RecyclerView? = null
+
+
+    companion object{
+        var folderListView: RecyclerView? = null
+        val deviceMusicList: MutableMap<String, List<Song>> = mutableMapOf()
+        private lateinit var adapter: Folderlistadapter
+        fun playernotify(){
+            playernotifyadapter()
+        }
+
+        private fun playernotifyadapter(){
+            if (deviceMusicByFolder.isNotEmpty()){
+                deviceMusicList.putAll(deviceMusicByFolder)
+                adapter.notifyItemRangeChanged(1,10)
+            }
+        }
+    }
+
+    var folderbinding: FragmentFolderBinding? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -25,12 +44,13 @@ class FolderFragment : Fragment() {
 
         folderbinding = FragmentFolderBinding.inflate(layoutInflater)
 
-        folderListView = folderbinding.foldersongrecyclerview
+        folderListView = folderbinding?.foldersongrecyclerview
         val layoutManager = LinearLayoutManager(requireContext())
         folderListView?.layoutManager = layoutManager
-        val adapter = Folderlistadapter(deviceMusicByFolder, medcontroller)
+        adapter = Folderlistadapter(deviceMusicList, medcontroller)
         folderListView?.adapter = adapter
 
-        return folderbinding.root
+
+        return folderbinding!!.root
     }
 }
