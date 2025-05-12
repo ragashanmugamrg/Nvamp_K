@@ -18,8 +18,12 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Nvamp"
+        android:theme="@style/Base.Theme.Nvamp"
         tools:targetApi="31">
+        <activity
+            android:name=".settings.NvampPlayerSettings"
+            android:exported="false" />
+
         <receiver
             android:name=".NvampApp"
             android:exported="false">
@@ -41,18 +45,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".MiniplayerActivity"
             android:exported="true"
             android:theme="@style/Theme.Nvamp.Miniplayer">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="file"/>
-                <data android:mimeType="audio/*"/>
-                <data android:scheme="content"/>
+
+                <data android:scheme="file" />
+                <data android:mimeType="audio/*" />
+                <data android:scheme="content" />
             </intent-filter>
         </activity>
 

@@ -16,8 +16,10 @@ import com.amp.nvamp.MainActivity.Companion.medcontroller
 import com.amp.nvamp.R
 import com.amp.nvamp.adapter.Folderlistadapter
 import com.amp.nvamp.playback.PlaybackService.Companion.sessionId
+import com.amp.nvamp.settings.NvampPlayerSettings
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
@@ -83,10 +85,16 @@ class ViewPagerFragment : Fragment() {
                     GenerFragment.playernotify()
                     PlaylistFragment.playernotify()
                     loaderview.visibility = GONE
+
+
+                    Snackbar.make(view, "All Songs Refreshed from disk", Snackbar.ANIMATION_MODE_FADE)
+                        .show()
+
                 }
                 return@setOnMenuItemClickListener true
             }else if (menuItem.title == "Settings"){
-
+                val settingsintent = Intent(context,NvampPlayerSettings::class.java)
+                startActivity(settingsintent)
             }else if (menuItem.title == "Equalizer"){
                 val intent: Intent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL).apply {
                     putExtra(AudioEffect.EXTRA_AUDIO_SESSION, sessionId)

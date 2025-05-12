@@ -13,11 +13,6 @@
         android:title="Delete"
         app:showAsAction="never"
         android:icon="@drawable/more_vert_48px" />
-    <item
-        android:id="@+id/playnext"
-        android:title="Play Next"
-        app:showAsAction="never"
-        android:icon="@drawable/more_vert_48px" />
 
     <item
         android:id="@+id/SetasRingtone"
