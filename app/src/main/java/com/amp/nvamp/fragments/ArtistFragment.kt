@@ -29,6 +29,7 @@ class ArtistFragment : Fragment() {
 
         private fun playernotifyadapter(){
             if (deviceMusicByArtist.isNotEmpty()){
+                deviceMusicList.clear()
                 deviceMusicList.putAll(deviceMusicByArtist)
                 adapter.notifyItemRangeChanged(1,10)
             }

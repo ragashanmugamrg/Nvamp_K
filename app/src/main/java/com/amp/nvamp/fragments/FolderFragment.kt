@@ -29,6 +29,7 @@ class FolderFragment : Fragment() {
 
         private fun playernotifyadapter(){
             if (deviceMusicByFolder.isNotEmpty()){
+                deviceMusicList.clear()
                 deviceMusicList.putAll(deviceMusicByFolder)
                 adapter.notifyItemRangeChanged(1,10)
             }

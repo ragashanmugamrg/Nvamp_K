@@ -28,6 +28,7 @@ class HomeFragment : Fragment() {
 
         private fun playernotifyadapter() {
             if (mediaitems.isNotEmpty()) {
+                musicList.clear()
                 musicList.addAll(mediaitems)
                 adapter.notifyItemRangeChanged(1, 12)
             }

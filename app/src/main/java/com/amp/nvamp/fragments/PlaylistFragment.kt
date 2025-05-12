@@ -32,6 +32,10 @@ class PlaylistFragment : Fragment() {
         private fun playernotifyadapter(){
             val deviceMusicByPlaylist = playerViewModel.getplayListMusic()
             if (deviceMusicByPlaylist.isNotEmpty()){
+                deviceMusicList.clear()
+                val deviceMusicByPlaylist = playerViewModel.getplayListMusic()
+                deviceMusicList.put("Recently Added", deviceMusicByDate)
+                deviceMusicList.putAll(deviceMusicByPlaylist)
                 deviceMusicList.putAll(deviceMusicByPlaylist)
                 adapter.notifyItemRangeChanged(1,10)
             }

@@ -160,6 +160,8 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             MediaStore.Audio.Media.DEFAULT_SORT_ORDER
         )
 
+        songs.clear()
+
         if (cursor != null) {
             while (cursor.moveToNext()) {
                 val title =
@@ -215,6 +217,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
                 )
                 songs.add(song)
 
+
                 val mediaItem = MediaItem.Builder().setMediaId(data)
                     .setUri(pathFile?.toUri())
                     .setMediaId("MediaStore:$id")
@@ -232,7 +235,6 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
                 mediaitems.add(mediaItem.build())
             }
         }
-
 
         deviceMusicByAlbum = songs.groupBy {
             it.album

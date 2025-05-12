@@ -89,6 +89,10 @@ class StoragePrefrence {
         return mutableListOf()
     }
 
+    fun clearsp(){
+        sp!!.edit().clear().apply()
+    }
+
 
     fun putsongdata(value: MutableList<Song>?) {
         val jsonAdapter =

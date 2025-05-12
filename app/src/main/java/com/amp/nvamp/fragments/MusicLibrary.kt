@@ -32,6 +32,7 @@ class MusicLibrary : Fragment() {
 
         private fun playernotifyadapter(){
             if (deviceMusicByAlbum.isNotEmpty()){
+                deviceMusicList.clear()
                 deviceMusicList.putAll(deviceMusicByAlbum)
                 adapter.notifyItemRangeChanged(1,10)
             }
