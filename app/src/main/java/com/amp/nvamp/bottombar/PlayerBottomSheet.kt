@@ -339,6 +339,7 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
                                 "",
                                     controller.mediaMetadata.description.toString(),
                                 0,
+                                    0
                             )
                                 var newplaylist = mutableListOf<Song>()
                                 newplaylist.add(playlist)
@@ -370,6 +371,7 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
                                 "",
                                 controller.mediaMetadata.description.toString(),
                                 0,
+                                0
                             )
                             var newplaylist = mutableListOf<Song>()
                             val play = playlistmap.get(selectedItem)?.toMutableList()

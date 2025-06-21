@@ -12,6 +12,7 @@ import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.C.WakeMode
+import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.Tracks
 import androidx.media3.common.util.UnstableApi
@@ -20,6 +21,7 @@ import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
+import com.amp.nvamp.MainActivity.Companion.playerViewModel
 import com.amp.nvamp.NvampApplication
 import com.amp.nvamp.R
 import com.google.common.util.concurrent.ListenableFuture
@@ -41,7 +43,6 @@ class PlaybackService : MediaSessionService(),Player.Listener,AudioManager.OnAud
         val loadControl = DefaultLoadControl.Builder()
             .setBufferDurationsMs(25000, 50000, 1000, 2000)
             .build()
-
 
         val audioAttributes = AudioAttributes.Builder()
             .setUsage(C.USAGE_MEDIA)
@@ -84,14 +85,22 @@ class PlaybackService : MediaSessionService(),Player.Listener,AudioManager.OnAud
     override fun onTracksChanged(tracks: Tracks) {
         super.onTracksChanged(tracks)
         Log.d("Service","Track Listerner")
+        val lastplay = playerViewModel.getlastplayedpos()
+        println(lastplay)
 
+
+    }
+
+    override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+        super.onMediaItemTransition(mediaItem, reason)
+        val lastplay = playerViewModel.getlastplayedpos()
+        //println(mediaItem!!.mediaMetadata.trackNumber)
+        mediaItem!!.mediaMetadata.trackNumber?.let { playerViewModel.setlastplayedpos(it) }
     }
 
 
     override fun onPlaybackStateChanged(playbackState: Int) {
         super.onPlaybackStateChanged(playbackState)
-
-
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

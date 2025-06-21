@@ -88,6 +88,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
                         .setMediaId("MediaStore:$data.id")
                         .setMediaMetadata(
                             MediaMetadata.Builder()
+                                .setTrackNumber(data.count)
                                 .setTitle(data.title)
                                 .setArtist(data.artist)
                                 .setDurationMs(data.duration)
@@ -135,6 +136,8 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         val album = mutableListOf<Album>()
         val selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0"
         val sortOrder = MediaStore.Audio.Media.TITLE + " ASC"
+
+        var count = 0
 
         val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         val projection = arrayOf(
@@ -197,6 +200,8 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
                     album_id
                 )
 
+                count += 1
+
                 println(adddate)
 
                 val pathFile = data?.let { it -> File(it) }
@@ -213,7 +218,8 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
                     year,
                     gener,
                     id,
-                    adddate
+                    adddate,
+                    count
                 )
                 songs.add(song)
 
@@ -223,6 +229,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
                     .setMediaId("MediaStore:$id")
                     .setMediaMetadata(
                         MediaMetadata.Builder()
+                            .setTrackNumber(count)
                             .setTitle(title)
                             .setArtist(artist)
                             .setArtworkUri(imgUri)

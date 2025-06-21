@@ -13,7 +13,9 @@ import android.widget.Toast
 import androidx.annotation.OptIn
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
 import androidx.recyclerview.widget.RecyclerView
@@ -28,12 +30,15 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.util.concurrent.ListenableFuture
+import java.io.File
 
 class Songslistadapter(
     private val mediaitems: MutableList<MediaItem>,
     private val medcontroller: ListenableFuture<MediaController>
 ): RecyclerView.Adapter<Songslistadapter.MyViewHolder>() {
 
+
+    var songqueue = mutableListOf<MediaItem>()
 
     val playlistmap = mutableMapOf<String,List<Song>>()
     val dynamicChoice: Set<String> = playlistmap.keys
@@ -86,9 +91,10 @@ class Songslistadapter(
 
 
         holder.itemView.setOnClickListener{
+            songqueue.addAll(mediaitems)
             if (medcontroller.isDone){
                 var controller = medcontroller.get()
-                controller.setMediaItems(mediaitems,position,0)
+                controller.setMediaItems(songqueue,position,0)
                 controller.play()
                 playerViewModel.setlastplayedpos(position)
             }
@@ -114,8 +120,28 @@ class Songslistadapter(
         }
         return when(item.title){
 
-            "Play Next"->{
-                Toast.makeText(context, "Play clicked", Toast.LENGTH_SHORT).show()
+            "Play Next" -> {
+                if(songqueue.isNotEmpty()){
+
+                    val lastplayedpos = playerViewModel.getlastplayedpos()
+                    val mediaItem = MediaItem.Builder().setMediaId(mediaitems[position].mediaMetadata.description.toString())
+                        .setUri((mediaitems[position].mediaMetadata.description.toString().let { it -> File(it) }).toUri())
+                        .setMediaId("MediaStore:id")
+                        .setMediaMetadata(
+                            MediaMetadata.Builder()
+                                .setTitle(mediaitems[position].mediaMetadata.title.toString())
+                                .setArtist(mediaitems[position].mediaMetadata.artist.toString())
+                                .setDurationMs(mediaitems[position].mediaMetadata.durationMs)
+                                .setArtworkUri(mediaitems[position].mediaMetadata.artworkUri!!)
+                                .setDescription(mediaitems[position].mediaMetadata.description.toString())
+                                .build()
+                        )
+                    songqueue.add(lastplayedpos,mediaItem.build())
+                    var controller = medcontroller.get()
+                    controller.addMediaItem(lastplayedpos,mediaItem.build())
+                    controller.prepare()
+
+                }
                 return true
             }
             "Add to Playlist" -> {
@@ -144,6 +170,7 @@ class Songslistadapter(
                                     "",
                                     mediaitems[position].mediaMetadata.description.toString(),
                                     0,
+                                    mediaitems[position].mediaMetadata.trackNumber
                                 )
                                 var newplaylist = mutableListOf<Song>()
                                 newplaylist.add(playlist)
@@ -175,6 +202,7 @@ class Songslistadapter(
                                 "",
                                 mediaitems[position].mediaMetadata.description.toString(),
                                 0,
+                                mediaitems[position].mediaMetadata.trackNumber
                             )
                             var newplaylist = mutableListOf<Song>()
                             val play = playlistmap.get(selectedItem)?.toMutableList()
