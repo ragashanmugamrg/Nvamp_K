@@ -14,6 +14,7 @@ Nvamp is a **sleek, fast, and full-featured offline music player** for Android. 
   <img src="screenshots/albums.jpg" width="200" />
   <img src="screenshots/folders.jpg" width="200" />
   <img src="screenshots/playlists.jpg" width="200" />
+  <img src="screenshots/recent_playlists.jpg" width="200" />
 </p>
 
 ---
