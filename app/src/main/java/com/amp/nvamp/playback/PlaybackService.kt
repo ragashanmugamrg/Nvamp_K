@@ -60,6 +60,8 @@ class PlaybackService : MediaSessionService(),Player.Listener,AudioManager.OnAud
         mediaSession = MediaSession.Builder(this, player).build()
 
 
+
+
         val sessionId = player.audioSessionId
         val loudnessEnhancer = LoudnessEnhancer(sessionId)
         loudnessEnhancer.setTargetGain(1000) // Gain in millibels
@@ -67,8 +69,6 @@ class PlaybackService : MediaSessionService(),Player.Listener,AudioManager.OnAud
 
         val equalizer = Equalizer(0, player.audioSessionId)
         equalizer.enabled = true
-
-
 
     }
 

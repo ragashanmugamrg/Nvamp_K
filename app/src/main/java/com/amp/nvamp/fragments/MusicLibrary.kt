@@ -18,7 +18,8 @@ import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByAlbum
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.lastPlayedMusic
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.playListMusic
 
-class MusicLibrary : Fragment() {
+class
+MusicLibrary : Fragment() {
 
     companion object{
         var libraryListView: RecyclerView? = null

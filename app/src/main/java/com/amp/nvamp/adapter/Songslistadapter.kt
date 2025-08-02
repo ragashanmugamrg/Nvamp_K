@@ -9,9 +9,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.annotation.OptIn
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
@@ -20,7 +18,6 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
 import androidx.recyclerview.widget.RecyclerView
 import com.amp.nvamp.MainActivity.Companion.playerViewModel
-import com.amp.nvamp.NvampApplication.Companion.context
 import com.amp.nvamp.R
 import com.amp.nvamp.data.Song
 import com.amp.nvamp.fragments.PlaylistFragment
