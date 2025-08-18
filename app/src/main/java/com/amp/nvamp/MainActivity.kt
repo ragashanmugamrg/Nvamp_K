@@ -38,6 +38,7 @@ import com.google.common.util.concurrent.MoreExecutors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class MainActivity : AppCompatActivity() {
@@ -69,14 +70,18 @@ class MainActivity : AppCompatActivity() {
         playerViewModel = ViewModelProvider(this)[PlayerViewModel::class.java]
 
 
-        lifecycleScope.launch {
-            PlayerViewModel(application).initialized()
-            HomeFragment.playernotify()
-            MusicLibrary.playernotify()
-            FolderFragment.playernotify()
-            ArtistFragment.playernotify()
-            GenerFragment.playernotify()
+        coroutineScope.launch {
+            withContext(Dispatchers.IO){
+                PlayerViewModel(application).initialized()
+                HomeFragment.playernotify()
+                MusicLibrary.playernotify()
+                FolderFragment.playernotify()
+                ArtistFragment.playernotify()
+                GenerFragment.playernotify()
+            }
         }
+
+
 
 
         var lastplayedmedias = playerViewModel.getlastplayedmedia()
