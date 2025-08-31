@@ -69,19 +69,15 @@ class MainActivity : AppCompatActivity() {
 
         playerViewModel = ViewModelProvider(this)[PlayerViewModel::class.java]
 
-
-        coroutineScope.launch {
-            withContext(Dispatchers.IO){
-                PlayerViewModel(application).initialized()
-                HomeFragment.playernotify()
-                MusicLibrary.playernotify()
-                FolderFragment.playernotify()
-                ArtistFragment.playernotify()
-                GenerFragment.playernotify()
-            }
+        
+        lifecycleScope.launch {
+            PlayerViewModel(application).initialized()
+            HomeFragment.playernotify()
+            MusicLibrary.playernotify()
+            FolderFragment.playernotify()
+            ArtistFragment.playernotify()
+            GenerFragment.playernotify()
         }
-
-
 
 
         var lastplayedmedias = playerViewModel.getlastplayedmedia()
@@ -111,26 +107,20 @@ class MainActivity : AppCompatActivity() {
     private fun permissionRequest() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.READ_MEDIA_AUDIO
+                    this, Manifest.permission.READ_MEDIA_AUDIO
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
                 ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.READ_MEDIA_AUDIO),
-                    123
+                    this, arrayOf(Manifest.permission.READ_MEDIA_AUDIO), 123
                 )
             }
         } else {
             if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
+                    this, Manifest.permission.READ_EXTERNAL_STORAGE
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
                 ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                    123
+                    this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 123
                 )
             }
         }
@@ -152,9 +142,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         coroutineScope.launch {
