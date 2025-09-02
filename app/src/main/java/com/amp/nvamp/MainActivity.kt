@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
 
         playerViewModel = ViewModelProvider(this)[PlayerViewModel::class.java]
 
-        
+
         lifecycleScope.launch {
             PlayerViewModel(application).initialized()
             HomeFragment.playernotify()
@@ -146,6 +146,7 @@ class MainActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         coroutineScope.launch {
+
             loaderview.visibility = VISIBLE
             PlayerViewModel(application).initialized()
             HomeFragment.playernotify()
@@ -154,6 +155,7 @@ class MainActivity : AppCompatActivity() {
             ArtistFragment.playernotify()
             GenerFragment.playernotify()
             loaderview.visibility = GONE
+
         }
     }
 

@@ -86,9 +86,6 @@ class PlaybackService : MediaSessionService(),Player.Listener,AudioManager.OnAud
         super.onTracksChanged(tracks)
         Log.d("Service","Track Listerner")
         val lastplay = playerViewModel.getlastplayedpos()
-        println(lastplay)
-
-
     }
 
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
