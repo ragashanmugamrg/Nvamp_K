@@ -1,0 +1,6 @@
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/squiggly_path">
+    <target
+        android:name="squiggle"
+        android:animation="@animator/squiggly_anim" />
+</animated-vector>

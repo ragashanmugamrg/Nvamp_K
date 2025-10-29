@@ -1,0 +1,15 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <path
+        android:name="squiggle"
+        android:strokeWidth="4"
+        android:strokeColor="?attr/colorPrimaryContainer"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M24,2
+                          C30,8 18,16 24,24
+                          C30,32 18,40 24,46" />
+</vector>

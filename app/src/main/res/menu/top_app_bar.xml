@@ -6,7 +6,7 @@
         android:id="@+id/favorite"
         android:title="favorite"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/star_48px"/>
+        android:icon="@drawable/playlist_add_48px"/>
 
     <item
         android:id="@+id/more"

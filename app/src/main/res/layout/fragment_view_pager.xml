@@ -26,8 +26,30 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:menu="@menu/home_menu"
-                app:title="@string/app_name" />
+                app:navigationIcon="@drawable/menu_24px"
+                app:menu="@menu/home_menu">
+
+            <com.google.android.material.search.SearchBar
+                android:id="@+id/search_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|top"
+                app:navigationIcon="@null"
+                app:menu="@null"
+                android:textAppearance="@style/TextAppearance.Material3.SearchBar"
+                app:hideNavigationIcon="true"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:hint="Search in songs"
+                android:textAlignment="center">
+            </com.google.android.material.search.SearchBar>
+
+            </com.google.android.material.appbar.MaterialToolbar>
+
+
+
+
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tab_layout"
@@ -103,14 +125,20 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Loading...."
+            android:text="@string/progresstitle"
             android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
             android:textSize="18sp"
             android:textStyle="bold" />
 
-        <ProgressBar
-            android:layout_width="98dp"
-            android:layout_height="68dp"
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progress_circular"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:indeterminate="true"
+            app:trackThickness="4dp"
+            app:indicatorSize="48dp"
+            app:indicatorInset="8dp"
             android:layout_gravity="center" />
 
     </com.google.android.material.card.MaterialCardView>

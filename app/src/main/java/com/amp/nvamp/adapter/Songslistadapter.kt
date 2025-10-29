@@ -167,7 +167,8 @@ class Songslistadapter(
                                     "",
                                     mediaitems[position].mediaMetadata.description.toString(),
                                     0,
-                                    mediaitems[position].mediaMetadata.trackNumber
+                                    mediaitems[position].mediaMetadata.trackNumber,
+                                    0L
                                 )
                                 var newplaylist = mutableListOf<Song>()
                                 newplaylist.add(playlist)
@@ -199,7 +200,8 @@ class Songslistadapter(
                                 "",
                                 mediaitems[position].mediaMetadata.description.toString(),
                                 0,
-                                mediaitems[position].mediaMetadata.trackNumber
+                                mediaitems[position].mediaMetadata.trackNumber,
+                                0L
                             )
                             var newplaylist = mutableListOf<Song>()
                             val play = playlistmap.get(selectedItem)?.toMutableList()

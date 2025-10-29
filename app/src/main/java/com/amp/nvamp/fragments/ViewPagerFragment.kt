@@ -19,6 +19,7 @@ import com.amp.nvamp.playback.PlaybackService.Companion.sessionId
 import com.amp.nvamp.settings.NvampPlayerSettings
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -54,6 +55,10 @@ class ViewPagerFragment : Fragment() {
         loaderview = view.findViewById(R.id.loaderview)
 
         toolbar = view.findViewById(R.id.toolbar)
+
+        val progressIndicator = view.findViewById<CircularProgressIndicator>(R.id.progress_circular)
+
+        progressIndicator.isIndeterminate = true
 
         fragmentContainer.adapter = com.amp.nvamp.adapter.TabLayout(requireActivity())
 

@@ -6,35 +6,30 @@ import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.audiofx.Equalizer
 import android.media.audiofx.LoudnessEnhancer
-import android.media.session.PlaybackState
 import android.util.Log
 import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
-import androidx.media3.common.C.WakeMode
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.Tracks
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.DefaultLoadControl
-import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import com.amp.nvamp.MainActivity.Companion.playerViewModel
-import com.amp.nvamp.NvampApplication
-import com.amp.nvamp.R
-import com.google.common.util.concurrent.ListenableFuture
 
-class PlaybackService : MediaSessionService(),Player.Listener,AudioManager.OnAudioFocusChangeListener {
+class PlaybackService : MediaSessionService(), Player.Listener, AudioManager.OnAudioFocusChangeListener {
 
     private var mediaSession: MediaSession? = null
+    private var equalizer: Equalizer? = null
+    private var loudnessEnhancer: LoudnessEnhancer? = null
 
-    companion object{
+    companion object {
         lateinit var player: ExoPlayer
         var sessionId: Int = 0
     }
-
 
     @OptIn(UnstableApi::class)
     override fun onCreate() {
@@ -51,29 +46,68 @@ class PlaybackService : MediaSessionService(),Player.Listener,AudioManager.OnAud
 
         player = ExoPlayer.Builder(this)
             .setLoadControl(loadControl)
-            .setAudioAttributes(audioAttributes,true)
+            .setAudioAttributes(audioAttributes, true)
             .build()
 
         player.addListener(this)
         player.setWakeMode(C.WAKE_MODE_LOCAL)
-        sessionId = player.audioSessionId
+
         mediaSession = MediaSession.Builder(this, player).build()
 
-
-
-
-        val sessionId = player.audioSessionId
-        val loudnessEnhancer = LoudnessEnhancer(sessionId)
-        loudnessEnhancer.setTargetGain(1000) // Gain in millibels
-        loudnessEnhancer.enabled = true
-
-        val equalizer = Equalizer(0, player.audioSessionId)
-        equalizer.enabled = true
-
+        setupAudioEffectsSafely()
     }
 
+    @OptIn(UnstableApi::class)
+    private fun setupAudioEffectsSafely() {
+        player.addListener(object : Player.Listener {
+            override fun onAudioSessionIdChanged(audioSessionId: Int) {
+                sessionId = audioSessionId
+                Log.d("PlaybackService", "AudioSessionId ready: $sessionId")
+
+                try {
+                    // Loudness Enhancer
+                    loudnessEnhancer = LoudnessEnhancer(sessionId).apply {
+                        setTargetGain(500) // Softer gain
+                        enabled = true
+                    }
+
+                    // Equalizer
+                    equalizer = Equalizer(0, sessionId)
+                    equalizer?.enabled = true
+
+                    val numBands = equalizer?.numberOfBands ?: 0
+                    val bandRange = equalizer?.bandLevelRange
+                    val minLevel = bandRange?.get(0) ?: -1500
+                    val maxLevel = bandRange?.get(1) ?: 1500
+
+                    Log.d("PlaybackService", "Equalizer bands: $numBands, level range: $minLevel to $maxLevel")
+
+                    for (i in 0 until numBands) {
+                        val level: Short = when (i.toInt()) {
+                            0 -> (maxLevel * 0.5f).toInt().toShort()       // Boost bass
+                            1 -> (maxLevel * 0.3f).toInt().toShort()       // Mid boost
+                            (numBands - 1).toInt() -> (minLevel * 0.5f).toInt().toShort() // Reduce treble
+                            else -> 0
+                        }
+
+                        if (level in minLevel..maxLevel) {
+                            equalizer?.setBandLevel(i.toShort(), level)
+                        }
+                    }
+
+                } catch (e: Exception) {
+                    Log.e("PlaybackService", "AudioEffect error: ${e.message}")
+                }
+            }
+        })
+    }
 
     override fun onDestroy() {
+        try {
+            equalizer?.release()
+            loudnessEnhancer?.release()
+        } catch (_: Exception) {}
+
         mediaSession?.run {
             player.release()
             release()
@@ -84,17 +118,15 @@ class PlaybackService : MediaSessionService(),Player.Listener,AudioManager.OnAud
 
     override fun onTracksChanged(tracks: Tracks) {
         super.onTracksChanged(tracks)
-        Log.d("Service","Track Listerner")
+        Log.d("Service", "Track Listener")
         val lastplay = playerViewModel.getlastplayedpos()
     }
 
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
         super.onMediaItemTransition(mediaItem, reason)
         val lastplay = playerViewModel.getlastplayedpos()
-        //println(mediaItem!!.mediaMetadata.trackNumber)
-        mediaItem!!.mediaMetadata.trackNumber?.let { playerViewModel.setlastplayedpos(it) }
+        mediaItem?.mediaMetadata?.trackNumber?.let { playerViewModel.setlastplayedpos(it) }
     }
-
 
     override fun onPlaybackStateChanged(playbackState: Int) {
         super.onPlaybackStateChanged(playbackState)
@@ -104,29 +136,27 @@ class PlaybackService : MediaSessionService(),Player.Listener,AudioManager.OnAud
         return super.onStartCommand(intent, flags, startId)
     }
 
-
     fun successfullyRetrievedAudioFocus(): Boolean {
         val audioManager: AudioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        var audioAttributes =  android.media.AudioAttributes.Builder()
+        val audioAttributes = android.media.AudioAttributes.Builder()
             .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
             .setContentType(android.media.AudioAttributes.CONTENT_TYPE_MUSIC)
             .build()
-        var audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+
+        val audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
             .setAudioAttributes(audioAttributes)
             .setOnAudioFocusChangeListener(this)
             .build()
+
         val result = audioManager.requestAudioFocus(audioFocusRequest)
         return result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
     }
 
-
-
-
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? =
         mediaSession
 
-    override fun onAudioFocusChange(position: Int) {
-        when(position){
+    override fun onAudioFocusChange(focusChange: Int) {
+        when (focusChange) {
             AudioManager.AUDIOFOCUS_LOSS -> player.pause()
             AudioManager.AUDIOFOCUS_GAIN -> {
                 player.volume = 1.0f

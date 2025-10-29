@@ -122,7 +122,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             }
 
             deviceMusicByDate = songs
-                .sortedByDescending { it.date }
+                .sortedByDescending { it.lastmodifiydate }
                 .toMutableList()
 
             lastplayedposition = 0
@@ -189,10 +189,14 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
                 var adddate =
                     cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED))
 
-                if (adddate == 0)
+                val file = File(data)
+                if (adddate.equals(0))
                     adddate = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED))
 
                 val foldername = data.replace(display_name, "")
+
+
+                var lastmodifydate = file.lastModified()
 
                 val artworkUri = Uri.parse("content://media/external/audio/albumart")
                 val imgUri = ContentUris.withAppendedId(
@@ -219,7 +223,8 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
                     gener,
                     id,
                     adddate,
-                    count
+                    count,
+                    lastmodifydate
                 )
                 songs.add(song)
 

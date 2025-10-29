@@ -33,6 +33,7 @@ import com.amp.nvamp.utils.NvampUtils
 import com.amp.nvamp.viewmodel.PlayerViewModel
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.mediaitems
 import com.google.android.material.color.DynamicColors
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import kotlinx.coroutines.CoroutineScope
@@ -59,13 +60,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var controller: MediaController
 
 
-    @SuppressLint("ResourceType")
+    @SuppressLint("ResourceType", "MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         DynamicColors.applyToActivityIfAvailable(this)
         enableEdgeToEdge()
 
         permissionRequest()
+
+
 
         playerViewModel = ViewModelProvider(this)[PlayerViewModel::class.java]
 
