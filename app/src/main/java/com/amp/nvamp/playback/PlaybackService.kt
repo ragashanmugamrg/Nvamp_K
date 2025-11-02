@@ -1,11 +1,14 @@
 package com.amp.nvamp.playback
 
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.media.AudioFocusRequest
 import android.media.AudioManager
+import android.media.audiofx.DynamicsProcessing
 import android.media.audiofx.Equalizer
 import android.media.audiofx.LoudnessEnhancer
+import android.os.Build
 import android.util.Log
 import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
@@ -18,6 +21,7 @@ import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
+import com.amp.nvamp.MainActivity
 import com.amp.nvamp.MainActivity.Companion.playerViewModel
 
 class PlaybackService : MediaSessionService(), Player.Listener, AudioManager.OnAudioFocusChangeListener {
@@ -25,6 +29,9 @@ class PlaybackService : MediaSessionService(), Player.Listener, AudioManager.OnA
     private var mediaSession: MediaSession? = null
     private var equalizer: Equalizer? = null
     private var loudnessEnhancer: LoudnessEnhancer? = null
+
+    private var dynamicsProcessing: DynamicsProcessing? = null
+    private var sessionId: Int = 0
 
     companion object {
         lateinit var player: ExoPlayer
@@ -52,7 +59,14 @@ class PlaybackService : MediaSessionService(), Player.Listener, AudioManager.OnA
         player.addListener(this)
         player.setWakeMode(C.WAKE_MODE_LOCAL)
 
-        mediaSession = MediaSession.Builder(this, player).build()
+
+        val sessionIntent = Intent(this.applicationContext, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(this, 0, sessionIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+
+        mediaSession = MediaSession.Builder(this, player)
+            .setSessionActivity(pendingIntent)
+            .build()
+
 
         setupAudioEffectsSafely()
     }
@@ -64,43 +78,85 @@ class PlaybackService : MediaSessionService(), Player.Listener, AudioManager.OnA
                 sessionId = audioSessionId
                 Log.d("PlaybackService", "AudioSessionId ready: $sessionId")
 
+                // Clean up any existing effects to prevent leaks or conflicts
+                releaseAudioEffects()
+
                 try {
-                    // Loudness Enhancer
+                    // 🎚️ Equalizer — tuned for headphone clarity
+                    equalizer = Equalizer(0, sessionId).apply {
+                        enabled = true
+                        val bandRange = bandLevelRange
+                        val minLevel = bandRange[0]
+                        val maxLevel = bandRange[1]
+                        val numBands = numberOfBands
+
+                        for (i in 0 until numBands) {
+                            val centerFreq = getCenterFreq(i.toShort()) / 1000 // Hz
+                            val level: Short = when {
+                                centerFreq < 120 -> (maxLevel * 0.7f).toInt().toShort()   // Deep bass boost
+                                centerFreq in 120..400 -> (maxLevel * 0.3f).toInt().toShort() // Warmth
+                                centerFreq in 400..1000 -> (minLevel * 0.2f).toInt().toShort() // Clean mids
+                                centerFreq in 1000..4000 -> (maxLevel * 0.4f).toInt().toShort() // Vocal clarity
+                                else -> (maxLevel * 0.6f).toInt().toShort()           // Sparkle highs
+                            }
+                            setBandLevel(i.toShort(), level)
+                        }
+                    }
+
+                    // 🔊 Loudness enhancer — push overall presence
                     loudnessEnhancer = LoudnessEnhancer(sessionId).apply {
-                        setTargetGain(500) // Softer gain
+                        setTargetGain(1800) // +18 dB — strong, but check for clipping
                         enabled = true
                     }
 
-                    // Equalizer
-                    equalizer = Equalizer(0, sessionId)
-                    equalizer?.enabled = true
+                    // 🧠 DynamicsProcessing — compression + bass/treble enhancement
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        val config = DynamicsProcessing.Config.Builder(
+                            DynamicsProcessing.VARIANT_FAVOR_FREQUENCY_RESOLUTION,
+                            1,  // channels
+                            true, 1, true, 1,true,1,true
+                        ).build()
 
-                    val numBands = equalizer?.numberOfBands ?: 0
-                    val bandRange = equalizer?.bandLevelRange
-                    val minLevel = bandRange?.get(0) ?: -1500
-                    val maxLevel = bandRange?.get(1) ?: 1500
+                        val channel = dynamicsProcessing?.getChannelByChannelIndex(0)
+                        channel?.getPreEqBand(0)?.gain = 3.0f
+                        channel?.getPostEqBand(config.postEqBandCount - 1)?.gain = 2.0f
 
-                    Log.d("PlaybackService", "Equalizer bands: $numBands, level range: $minLevel to $maxLevel")
-
-                    for (i in 0 until numBands) {
-                        val level: Short = when (i.toInt()) {
-                            0 -> (maxLevel * 0.5f).toInt().toShort()       // Boost bass
-                            1 -> (maxLevel * 0.3f).toInt().toShort()       // Mid boost
-                            (numBands - 1).toInt() -> (minLevel * 0.5f).toInt().toShort() // Reduce treble
-                            else -> 0
+                        // configure limiter
+                        channel?.limiter?.apply {
+                            attackTime = 20f
+                            releaseTime = 300f
+                            ratio = 2.5f
+                            threshold = -10f
                         }
-
-                        if (level in minLevel..maxLevel) {
-                            equalizer?.setBandLevel(i.toShort(), level)
-                        }
+                        Log.d("PlaybackService", "DynamicsProcessing applied for headphones")
                     }
 
                 } catch (e: Exception) {
-                    Log.e("PlaybackService", "AudioEffect error: ${e.message}")
+                    Log.e("PlaybackService", "AudioEffect error: ${e.stackTraceToString()}")
                 }
             }
         })
     }
+
+    /**
+     * Safely release audio effects before re-creating them
+     */
+    private fun releaseAudioEffects() {
+        try {
+            equalizer?.release()
+            loudnessEnhancer?.release()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                dynamicsProcessing?.release()
+            }
+        } catch (e: Exception) {
+            Log.w("PlaybackService", "Error releasing audio effects: ${e.message}")
+        } finally {
+            equalizer = null
+            loudnessEnhancer = null
+            dynamicsProcessing = null
+        }
+    }
+
 
     override fun onDestroy() {
         try {
