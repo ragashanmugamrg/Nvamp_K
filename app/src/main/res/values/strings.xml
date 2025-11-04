@@ -12,5 +12,7 @@
     <string name="app_widget_description">This is an app widget description</string>
     <string name="dark_mode">Enable Dark Mode</string>
     <string name="settings">Settings</string>
+    <string name="refresh">Refresh</string>
+    <string name="options">Options</string>
     <string name="progresstitle">Collecting....</string>
 </resources>

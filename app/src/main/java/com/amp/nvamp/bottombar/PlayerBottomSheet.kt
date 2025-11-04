@@ -153,7 +153,6 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
 
     var sliderTouchListener = object : Slider.OnSliderTouchListener {
         override fun onStartTrackingTouch(slider: Slider) {
-            print(slider.value)
         }
 
         override fun onStopTrackingTouch(slider: Slider) {

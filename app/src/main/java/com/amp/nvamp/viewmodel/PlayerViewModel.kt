@@ -118,7 +118,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             }
 
             deviceMusicByGener = songs.groupBy {
-                it.gener.toString()
+                it.gener.toString() ?: "Unknown"
             }
 
             deviceMusicByDate = songs
@@ -206,8 +206,6 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
                 count += 1
 
-                println(adddate)
-
                 val pathFile = data?.let { it -> File(it) }
 
                 val song = Song(
@@ -264,7 +262,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             .toMutableList()
 
 
-        deviceMusicByGener = songs.groupBy { it.gener.toString() }
+        deviceMusicByGener = songs.groupBy { it.gener.toString() ?: "Unknown" }
     }
 
 }

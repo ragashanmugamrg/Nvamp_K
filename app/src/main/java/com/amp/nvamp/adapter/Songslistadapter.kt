@@ -120,7 +120,7 @@ class Songslistadapter(
             "Play Next" -> {
                 if(songqueue.isNotEmpty()){
 
-                    val lastplayedpos = playerViewModel.getlastplayedpos()
+//                    val lastplayedpos = playerViewModel.getlastplayedpos()
                     val mediaItem = MediaItem.Builder().setMediaId(mediaitems[position].mediaMetadata.description.toString())
                         .setUri((mediaitems[position].mediaMetadata.description.toString().let { it -> File(it) }).toUri())
                         .setMediaId("MediaStore:id")
@@ -132,10 +132,10 @@ class Songslistadapter(
                                 .setArtworkUri(mediaitems[position].mediaMetadata.artworkUri!!)
                                 .setDescription(mediaitems[position].mediaMetadata.description.toString())
                                 .build()
-                        )
-                    songqueue.add(lastplayedpos,mediaItem.build())
+                        ).build()
+//                    songqueue.add(lastplayedpos,mediaItem.build())
                     var controller = medcontroller.get()
-                    controller.addMediaItem(lastplayedpos,mediaItem.build())
+                    controller.addMediaItem(medcontroller.get().currentMediaItemIndex+1,mediaItem)
                     controller.prepare()
 
                 }

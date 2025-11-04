@@ -8,6 +8,9 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import androidx.core.view.GravityCompat
+import androidx.core.widget.addTextChangedListener
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
@@ -19,7 +22,10 @@ import com.amp.nvamp.playback.PlaybackService.Companion.sessionId
 import com.amp.nvamp.settings.NvampPlayerSettings
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.navigation.NavigationView
 import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.google.android.material.search.SearchBar
+import com.google.android.material.search.SearchView
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -32,6 +38,11 @@ class ViewPagerFragment : Fragment() {
     private lateinit var fragmentContainer: ViewPager2
     private lateinit var tabLayout: TabLayout
     private lateinit var toolbar: MaterialToolbar
+    private lateinit var navigationview: NavigationView
+    private lateinit var drawerLayout: DrawerLayout
+
+    private lateinit var searchBar: SearchBar
+    private lateinit var searchView: SearchView
     companion object{
         lateinit var loaderview: MaterialCardView
     }
@@ -52,9 +63,16 @@ class ViewPagerFragment : Fragment() {
         tabLayout = view.findViewById(R.id.tab_layout)
         fragmentContainer = view.findViewById(R.id.fragmentcontainer)
 
+        drawerLayout = view.findViewById(R.id.drawer_layout)
+
         loaderview = view.findViewById(R.id.loaderview)
 
+        searchBar = view.findViewById(R.id.search_bar)
+        searchView = view.findViewById(R.id.search_view)
+
         toolbar = view.findViewById(R.id.toolbar)
+
+        navigationview = view.findViewById(R.id.navigation_view)
 
         val progressIndicator = view.findViewById<CircularProgressIndicator>(R.id.progress_circular)
 
@@ -76,6 +94,54 @@ class ViewPagerFragment : Fragment() {
                 else -> "Unknown"
             }
         }.attach()
+
+        // 🔗 Connect search bar with search view
+        searchView.setupWithSearchBar(searchBar)
+
+
+        // 🔍 Handle search text changes
+        searchView.editText.addTextChangedListener { text ->
+
+        }
+
+        toolbar.setNavigationOnClickListener {
+            drawerLayout.openDrawer(GravityCompat.START)
+        }
+
+
+        // Handle menu item clicks
+        navigationview.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.settingsd -> { /* Handle Home */
+                    val settingsintent = Intent(context, NvampPlayerSettings::class.java)
+                    startActivity(settingsintent)
+                }
+
+                R.id.refreshd-> { /* Handle Settings */
+                    lifecycleScope.launch {
+                        loaderview.visibility = VISIBLE
+                        MainActivity.playerViewModel.refreshdatainpref()
+                        HomeFragment.playernotify()
+                        MusicLibrary.playernotify()
+                        FolderFragment.playernotify()
+                        ArtistFragment.playernotify()
+                        GenerFragment.playernotify()
+                        PlaylistFragment.playernotify()
+                        loaderview.visibility = GONE
+
+
+                        Snackbar.make(
+                            view,
+                            "All Songs Refreshed from disk",
+                            Snackbar.ANIMATION_MODE_FADE
+                        )
+                            .show()
+                    }
+                }
+            }
+            drawerLayout.closeDrawer(GravityCompat.START)
+            true
+        }
 
 
         toolbar.setOnMenuItemClickListener { menuItem ->

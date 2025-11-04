@@ -23,7 +23,7 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:navigationIcon="@drawable/arrow_back_40px"
+                app:navigationIcon="@drawable/arrow_back_24px"
                 app:title="@string/app_name" />
 
         </com.google.android.material.appbar.AppBarLayout>
