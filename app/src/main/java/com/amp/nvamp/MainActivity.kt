@@ -100,7 +100,8 @@ class MainActivity : AppCompatActivity() {
             {
                 if (medcontroller.isDone) {
                     controller = medcontroller.get()
-                    controller.setMediaItems(mediaitems)
+                    playerViewModel.getlastplayedpos()
+                    controller.setMediaItems(mediaitems, playerViewModel.getlastplayedpos(),0L)
                 }
             }, MoreExecutors.directExecutor()
         )

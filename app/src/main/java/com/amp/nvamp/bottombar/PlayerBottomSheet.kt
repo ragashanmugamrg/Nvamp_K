@@ -180,7 +180,7 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
             {
                 if (mediaController.isDone) {
                     controller = mediaController.get()
-                    controller.setMediaItems(mediaitems)
+                    controller.setMediaItems(mediaitems, playerViewModel.getlastplayedpos(),0L)
                     controller.addListener(object : Player.Listener {
                         override fun onIsPlayingChanged(isPlaying: Boolean) {
                             super.onIsPlayingChanged(isPlaying)

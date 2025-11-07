@@ -23,6 +23,7 @@ import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import com.amp.nvamp.MainActivity
 import com.amp.nvamp.MainActivity.Companion.playerViewModel
+import com.amp.nvamp.viewmodel.PlayerViewModel
 
 class PlaybackService : MediaSessionService(), Player.Listener, AudioManager.OnAudioFocusChangeListener {
 
@@ -32,6 +33,7 @@ class PlaybackService : MediaSessionService(), Player.Listener, AudioManager.OnA
 
     private var dynamicsProcessing: DynamicsProcessing? = null
     private var sessionId: Int = 0
+    private var hasInitializedPlayback = false
 
     companion object {
         lateinit var player: ExoPlayer
@@ -180,8 +182,10 @@ class PlaybackService : MediaSessionService(), Player.Listener, AudioManager.OnA
 
     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
         super.onMediaItemTransition(mediaItem, reason)
-        val lastplay = playerViewModel.getlastplayedpos()
-        mediaItem?.mediaMetadata?.trackNumber?.let { playerViewModel.setlastplayedpos(it) }
+        if (!hasInitializedPlayback) {
+            hasInitializedPlayback = true
+            return
+        }
     }
 
     override fun onPlaybackStateChanged(playbackState: Int) {

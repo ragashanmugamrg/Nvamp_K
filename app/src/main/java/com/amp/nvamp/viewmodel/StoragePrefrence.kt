@@ -33,12 +33,14 @@ class StoragePrefrence {
     }
 
 
-    fun putLastplayedpos(lastplayedposition: Int){
-        val position = sp!!.edit().putInt("lastplayedpos", lastplayedposition).apply()
+    fun putLastplayedpos(lastPlayedPosition: Int) {
+        print(lastPlayedPosition)
+        sp?.edit()?.putInt("lastplayedpos", lastPlayedPosition)?.apply()
     }
 
-    fun getLastplayedpos(): Int{
-        return sp!!.getInt("lastplayedpos", 0)
+    fun getLastplayedpos(): Int {
+        print((" lastplayed pos" + sp?.getInt("lastplayedpos", 0)) ?: 0)
+        return sp?.getInt("lastplayedpos", 0) ?: 0
     }
 
     fun putplayListMusic(value: Map<String, List<Song>>?) {

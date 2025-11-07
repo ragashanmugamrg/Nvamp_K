@@ -45,8 +45,9 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         StoragePrefrence().putLastplayedpos(value)
     }
 
-    fun getlastplayedpos(): Int {
-        return StoragePrefrence().getLastplayedpos()
+    public fun getlastplayedpos():Int{
+         lastplayedposition = StoragePrefrence().getLastplayedpos()
+        return lastplayedposition
     }
 
 
@@ -103,29 +104,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
                 dataIniziser()
                 StoragePrefrence().putsongdata(songs)
             }
-
-
-            deviceMusicByAlbum = songs.groupBy {
-                it.album
-            }
-
-            deviceMusicByFolder = songs.groupBy {
-                it.foldername
-            }
-
-            deviceMusicByArtist = songs.groupBy {
-                it.artist
-            }
-
-            deviceMusicByGener = songs.groupBy {
-                it.gener.toString() ?: "Unknown"
-            }
-
-            deviceMusicByDate = songs
-                .sortedByDescending { it.lastmodifiydate }
-                .toMutableList()
-
-            lastplayedposition = 0
+            updateCategorize(songs)
         }
     }
 
@@ -218,14 +197,13 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
                     album_id,
                     imgUri,
                     year,
-                    gener,
+                    gener?: "Unknown",
                     id,
                     adddate,
                     count,
                     lastmodifydate
                 )
                 songs.add(song)
-
 
                 val mediaItem = MediaItem.Builder().setMediaId(data)
                     .setUri(pathFile?.toUri())
@@ -245,24 +223,15 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
                 mediaitems.add(mediaItem.build())
             }
         }
+        updateCategorize(songs)
+    }
 
-        deviceMusicByAlbum = songs.groupBy {
-            it.album
-        }
-
-        deviceMusicByFolder = songs.groupBy {
-            it.foldername
-        }
-
-        deviceMusicByArtist = songs.groupBy {
-            it.artist
-        }
-
-        deviceMusicByDate = songs.sortedByDescending { it.date }
-            .toMutableList()
-
-
-        deviceMusicByGener = songs.groupBy { it.gener.toString() ?: "Unknown" }
+    fun updateCategorize(songs: MutableList<Song>){
+        deviceMusicByAlbum = songs.groupBy { it.album }
+        deviceMusicByFolder = songs.groupBy { it.foldername }
+        deviceMusicByArtist = songs.groupBy { it.artist }
+        deviceMusicByDate = songs.sortedByDescending { it.date }.toMutableList()
+        deviceMusicByGener = songs.groupBy { it.gener ?: "Unknown" }
     }
 
 }

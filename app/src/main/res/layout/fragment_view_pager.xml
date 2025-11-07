@@ -93,6 +93,13 @@
         </com.google.android.material.card.MaterialCardView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <com.google.android.material.search.SearchView
+        android:id="@+id/search_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:hint="Search songs..."
+        app:layout_anchor="@id/search_bar"/>
+
     <!-- Drawer (side menu) -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigation_view"
@@ -101,11 +108,6 @@
         android:layout_gravity="start"
         app:menu="@menu/navigationdrawer"
         app:headerLayout="@layout/nav_header" />
-    <com.google.android.material.search.SearchView
-        android:id="@+id/search_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:hint="Search songs..."
-        app:layout_anchor="@id/search_bar"/>
+
 
 </androidx.drawerlayout.widget.DrawerLayout>
