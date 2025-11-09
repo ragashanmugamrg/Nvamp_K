@@ -82,11 +82,6 @@ class MainActivity : AppCompatActivity() {
             GenerFragment.playernotify()
         }
 
-
-        var lastplayedmedias = playerViewModel.getlastplayedmedia()
-        var lastplayedpos = playerViewModel.getlastplayedpos()
-
-
         setContentView(R.layout.activity_main)
 
         customFragmentManager = supportFragmentManager

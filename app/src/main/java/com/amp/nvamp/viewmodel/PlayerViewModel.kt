@@ -22,6 +22,7 @@ import java.io.File
 class PlayerViewModel(application: Application) : AndroidViewModel(application) {
 
     var songs = mutableListOf<Song>()
+    private val storageRepo = StorageRepository(application)
 
     companion object {
         var mediaitems = mutableListOf<MediaItem>()
@@ -73,7 +74,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     suspend fun refreshdatainpref() {
         withContext(Dispatchers.IO) {
             dataIniziser()
-            StoragePrefrence().putsongdata(songs)
+            storageRepo.saveAllSongs(songs)
         }
     }
 
@@ -81,7 +82,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     @OptIn(UnstableApi::class)
     suspend fun initialized() {
         withContext(Dispatchers.IO) {
-            songs = StoragePrefrence().getsongdata()
+            songs = storageRepo.getAllSongs().toMutableList()
             if (songs.isNotEmpty()) {
                 songs.forEach { data ->
                     val mediaItem = MediaItem.Builder().setMediaId(data.data)
@@ -102,7 +103,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
                 }
             } else {
                 dataIniziser()
-                StoragePrefrence().putsongdata(songs)
+                storageRepo.saveAllSongs(songs)
             }
             updateCategorize(songs)
         }
@@ -112,7 +113,6 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     @OptIn(UnstableApi::class)
     fun dataIniziser() {
         val contentResolver: ContentResolver = NvampApplication.context.contentResolver
-        val album = mutableListOf<Album>()
         val selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0"
         val sortOrder = MediaStore.Audio.Media.TITLE + " ASC"
 

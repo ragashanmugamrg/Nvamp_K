@@ -2,11 +2,17 @@ package com.amp.nvamp.storagesystem
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.amp.nvamp.data.Song
+import androidx.room.TypeConverters
+import com.amp.nvamp.storagesystem.dao.PlayListDao
+import com.amp.nvamp.storagesystem.data.SongEntity
+import com.amp.nvamp.storagesystem.dao.SongDao
+import com.amp.nvamp.storagesystem.data.PlaylistEntity
 
-
+@Database(
+    entities = [SongEntity::class], version = 1, exportSchema = false)
+@TypeConverters(TypeConvertor::class)
 abstract class AppDatabase: RoomDatabase() {
-    abstract fun songDao(): Song
-    abstract fun lastplayedDao()
-    abstract fun playlistDao()
+    abstract fun songDao(): SongDao
+    //abstract fun playlistDao(): PlayListDao
+//    abstract fun playlistDao()
 }
