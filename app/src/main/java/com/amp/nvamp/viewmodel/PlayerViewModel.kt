@@ -45,7 +45,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         StoragePrefrence().putLastplayedpos(value)
     }
 
-    public fun getlastplayedpos():Int{
+    fun getlastplayedpos():Int{
          lastplayedposition = StoragePrefrence().getLastplayedpos()
         return lastplayedposition
     }

@@ -1,6 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+
+    //ksp annotation process
+    id("com.google.devtools.ksp") version "1.9.22-1.0.17"
 }
 
 android {
@@ -59,7 +62,17 @@ dependencies {
     implementation(libs.androidx.media3.ui)
     implementation(libs.glide)
     implementation(libs.moshi)
-
     implementation("com.squareup.moshi:moshi-kotlin:1.15.2")
+
+
+
+    // Room components
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    annotationProcessor("androidx.room:room-compiler:2.6.1")
+    ksp("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.room:room-paging:2.6.1")
+
+    //----------
 
 }
