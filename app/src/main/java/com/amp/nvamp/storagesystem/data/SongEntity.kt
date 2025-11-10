@@ -49,12 +49,30 @@ fun Song.toEntity(): SongEntity {
 }
 
 
+
+
 @Entity(tableName = "playlist")
 data class PlaylistEntity(
     @PrimaryKey(autoGenerate = true) val playlistid: Int = 0,
     val playlistname: String,
 )
 
+
+@Entity(primaryKeys = ["playlistid","songid"])
+data class PlaylistCrossRef(
+    val playlistid: Int,
+    val songid: Int
+)
+
+
+data class PlaylistWithsongs(
+    @Embedded val playlistname: PlaylistEntity,
+    @Relation(parentColumn = "playlistid",
+        entityColumn = "songid",
+        associateBy = Junction(PlaylistCrossRef::class)
+    )
+    val playlists: List<SongEntity>
+)
 
 @Entity(tableName = "lastplayed")
 data class lastPlayedEntity(

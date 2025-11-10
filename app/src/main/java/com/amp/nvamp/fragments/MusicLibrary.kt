@@ -9,14 +9,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.amp.nvamp.MainActivity.Companion.medcontroller
 import com.amp.nvamp.adapter.Albumlistadapter
-import com.amp.nvamp.adapter.Songslistadapter
 import com.amp.nvamp.data.Song
 import com.amp.nvamp.databinding.FragmentMusicLibraryBinding
-import com.amp.nvamp.fragments.HomeFragment.Companion
-import com.amp.nvamp.viewmodel.PlayerViewModel
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByAlbum
-import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.lastPlayedMusic
-import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.playListMusic
 
 class
 MusicLibrary : Fragment() {

@@ -9,6 +9,8 @@ import androidx.annotation.OptIn
 import androidx.core.net.toUri
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
@@ -16,6 +18,7 @@ import com.amp.nvamp.NvampApplication
 import com.amp.nvamp.data.Album
 import com.amp.nvamp.data.Song
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
@@ -34,47 +37,18 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
         var deviceMusicByDate: MutableList<Song> = mutableListOf()
 
-        var lastPlayedMusic = mutableListOf<MediaItem>()
         var playListMusic: Map<String, List<Song>> = mutableMapOf()
 
         var lastplayedposition: Int = 0
 
-        lateinit var customFragmentManager: FragmentManager
-    }
-
-    fun setlastplayedpos(value: Int) {
-        StoragePrefrence().putLastplayedpos(value)
-    }
-
-    fun getlastplayedpos():Int{
-         lastplayedposition = StoragePrefrence().getLastplayedpos()
-        return lastplayedposition
     }
 
 
-    fun setlastplayedmedia(lastPlayedMusic: MutableList<Song>) {
-        StoragePrefrence().putlastplayed(lastPlayedMusic)
-    }
-
-    fun getlastplayedmedia(): MutableList<Song> {
-        return StoragePrefrence().getlastplayed()
-    }
-
-
-    fun setplayListMusic(lastPlayedMusic: Map<String, List<Song>>) {
-        playListMusic = lastPlayedMusic
-        StoragePrefrence().putplayListMusic(lastPlayedMusic)
-    }
-
-    fun getplayListMusic(): Map<String, List<Song>> {
-        return StoragePrefrence().getplayListMusic()
-    }
 
     @OptIn(UnstableApi::class)
     suspend fun refreshdatainpref() {
         withContext(Dispatchers.IO) {
             dataIniziser()
-            storageRepo.saveAllSongs(songs)
         }
     }
 
@@ -103,7 +77,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
                 }
             } else {
                 dataIniziser()
-                storageRepo.saveAllSongs(songs)
+                //storageRepo.saveAllSongs(songs)
             }
             updateCategorize(songs)
         }
@@ -111,7 +85,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
 
     @OptIn(UnstableApi::class)
-    fun dataIniziser() {
+    suspend fun dataIniziser() {
         val contentResolver: ContentResolver = NvampApplication.context.contentResolver
         val selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0"
         val sortOrder = MediaStore.Audio.Media.TITLE + " ASC"
@@ -143,6 +117,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         )
 
         songs.clear()
+        mediaitems.clear()
 
         if (cursor != null) {
             while (cursor.moveToNext()) {
@@ -224,6 +199,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
         updateCategorize(songs)
+        storageRepo.saveAllSongs(songs)
     }
 
     fun updateCategorize(songs: MutableList<Song>){
@@ -232,6 +208,29 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         deviceMusicByArtist = songs.groupBy { it.artist }
         deviceMusicByDate = songs.sortedByDescending { it.date }.toMutableList()
         deviceMusicByGener = songs.groupBy { it.gener ?: "Unknown" }
+    }
+
+    fun setlastplayedpos(value: Int) {
+        StoragePrefrence().putLastplayedpos(value)
+    }
+
+    fun getlastplayedpos():Int{
+        lastplayedposition = StoragePrefrence().getLastplayedpos()
+        return lastplayedposition
+    }
+
+
+    fun setplayListMusic(playList: Map<String, List<Song>>) {
+        viewModelScope.launch {
+            storageRepo.savealltheplaylist(playList)
+        }
+    }
+
+    fun getplayListMusic(): Map<String, List<Song>> {
+        viewModelScope.launch {
+            playListMusic = storageRepo.getalltheplaylist()
+        }
+        return playListMusic
     }
 
 }

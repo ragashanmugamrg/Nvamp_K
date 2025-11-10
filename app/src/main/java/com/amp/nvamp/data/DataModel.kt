@@ -2,6 +2,7 @@ package com.amp.nvamp.data
 
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import com.amp.nvamp.storagesystem.data.SongEntity
 import com.squareup.moshi.Json
 
 data class Song(
@@ -20,6 +21,27 @@ data class Song(
     @Json(name = "count") val count: Int?,
     @Json(name = "lastmodifiydate") val lastmodifiydate: Long?
 )
+
+
+
+fun SongEntity.toSongs(): Song {
+    return Song(
+        id = this.id ?: "",
+        title = this.title ?: "",
+        artist = this.artist ?: "",
+        album = this.album ?: "",
+        duration = this.duration ?: 0L,
+        data = this.data ?: "",
+        foldername = this.folder_name ?: "",
+        album_id = this.album_id ?: 0L,
+        imgUri = this.imgUri?: Uri.EMPTY,
+        year = this.year ?: "",
+        gener = this.gener ?: "",
+        date = this.date ?: 0,
+        count = this.count ?: 0,
+        lastmodifiydate = this.last_modifiy_dt ?: 0L
+    )
+}
 
 
 data class Album(

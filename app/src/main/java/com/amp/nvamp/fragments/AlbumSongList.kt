@@ -92,7 +92,7 @@ class AlbumSongList : Fragment() {
     @OptIn(UnstableApi::class)
     fun changeSongmodeltoMediaitem(listofsongs: List<Song>?): MutableList<MediaItem>{
         var mediasongs = mutableListOf<MediaItem>()
-        playerViewModel.setlastplayedmedia(listofsongs!!.toMutableList())
+        //playerViewModel.setlastplayedmedia(listofsongs!!.toMutableList())
         if (listofsongs!!.isNotEmpty()) {
             listofsongs.forEach { data ->
                 val mediaItem = MediaItem.Builder().setMediaId(data.data)
