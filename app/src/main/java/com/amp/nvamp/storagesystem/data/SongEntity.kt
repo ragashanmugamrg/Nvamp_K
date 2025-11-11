@@ -66,7 +66,7 @@ data class PlaylistCrossRef(
 
 
 data class PlaylistWithsongs(
-    @Embedded val playlistname: PlaylistEntity,
+    @Embedded val playlist: PlaylistEntity,
     @Relation(parentColumn = "playlistid",
         entityColumn = "songid",
         associateBy = Junction(PlaylistCrossRef::class)

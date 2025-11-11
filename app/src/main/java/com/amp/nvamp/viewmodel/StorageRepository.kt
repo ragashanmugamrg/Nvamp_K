@@ -86,7 +86,7 @@ class StorageRepository(context: Context) {
         withContext(Dispatchers.IO) {
             val playist = playlistDao.getPlayListWithSongs()
             playist.associate { playlistWithsongs ->
-                playlistWithsongs.playlistname.playlistname to playlistWithsongs.playlists.map { it.toSongs() }
+                playlistWithsongs.playlist.playlistname to playlistWithsongs.playlists.map { it.toSongs() }
             }
         }
 
