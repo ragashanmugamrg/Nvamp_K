@@ -14,17 +14,21 @@ import com.amp.nvamp.storagesystem.data.SongEntity
 @Dao
 interface PlayListDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertSongs(songs: List<SongEntity>): List<Long>
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertSongs(songs: List<SongEntity>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPlayList(playlist: PlaylistEntity):Long
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertPlaylistCrossref(playlistCrossRef: List<PlaylistCrossRef>)
+
 
     @Transaction
     @Query("Select * from playlist")
     suspend fun getPlayListWithSongs(): List<PlaylistWithsongs>
+
+    @Query("SELECT * FROM songs WHERE id IN (:ids)")
+    suspend fun getSongsByIds(ids: List<String?>): List<SongEntity>
 
 }

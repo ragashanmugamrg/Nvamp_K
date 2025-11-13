@@ -16,7 +16,7 @@ data class Song(
     @Json(name = "imgUri") val imgUri: Uri,
     @Json(name = "year") val year: String?,
     @Json(name = "gener") val gener: String?,
-    @Json(name = "id") val id: String?,
+    @Json(name = "id") val id: String,
     @Json(name = "date") val date: Int?,
     @Json(name = "count") val count: Int?,
     @Json(name = "lastmodifiydate") val lastmodifiydate: Long?

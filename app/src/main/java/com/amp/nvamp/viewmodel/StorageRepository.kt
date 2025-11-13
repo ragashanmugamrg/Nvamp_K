@@ -1,7 +1,6 @@
 package com.amp.nvamp.viewmodel
 
 import android.content.Context
-import androidx.room.Transaction
 import com.amp.nvamp.data.Song
 import com.amp.nvamp.data.toSongs
 import com.amp.nvamp.storagesystem.DatabaseProvider
@@ -66,27 +65,38 @@ class StorageRepository(context: Context) {
 
     suspend fun savealltheplaylist(playlist: Map<String, List<Song>>) =
         withContext(Dispatchers.IO) {
-            playlist.forEach { (s, songs) ->
-                val playlistid = playlistDao.insertPlayList(
-                    PlaylistEntity(playlistname = s)
-                )
+            playlist.forEach { (playlistName, songs) ->
+                // Convert songs to entities
+                val songEntities = songs.map { it.toEntity() }
 
-                val songentity = songs.map { it.toEntity() }
-                val insertsongenetity = playlistDao.insertSongs(songentity)
+                // First, insert all songs (REPLACE strategy handles duplicates)
+                playlistDao.insertSongs(songEntities)
 
-                val crossRef = insertsongenetity.map { song ->
-                    PlaylistCrossRef(playlistid = playlistid.toInt(), songid = song.toInt())
+                // Insert the playlist and get its ID
+                val playlistId = playlistDao.insertPlayList(
+                    PlaylistEntity(playlistname = playlistName)
+                ).toInt()
+
+                // Only create cross references if playlist was successfully created
+                if (playlistId > 0) {
+                    val crossRefs = songEntities.map { song ->
+                        PlaylistCrossRef(
+                            playlistid = playlistId,
+                            id = song.id
+                        )
+                    }
+                    playlistDao.insertPlaylistCrossref(crossRefs)
                 }
-
-                playlistDao.insertPlaylistCrossref(crossRef)
             }
         }
 
     suspend fun getalltheplaylist(): Map<String, List<Song>> =
         withContext(Dispatchers.IO) {
-            val playist = playlistDao.getPlayListWithSongs()
-            playist.associate { playlistWithsongs ->
-                playlistWithsongs.playlist.playlistname to playlistWithsongs.playlists.map { it.toSongs() }
+            val playlists = playlistDao.getPlayListWithSongs()
+            playlists.associate { playlistWithSongs ->
+                playlistWithSongs.playlist.playlistname to playlistWithSongs.playlists.map {
+                    it.toSongs()
+                }
             }
         }
 

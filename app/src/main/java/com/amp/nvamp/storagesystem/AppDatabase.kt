@@ -10,7 +10,7 @@ import com.amp.nvamp.storagesystem.data.PlaylistCrossRef
 import com.amp.nvamp.storagesystem.data.PlaylistEntity
 
 @Database(
-    entities = [SongEntity::class,PlaylistEntity::class,PlaylistCrossRef::class], version = 1, exportSchema = false)
+    entities = [SongEntity::class,PlaylistEntity::class,PlaylistCrossRef::class], version = 2, exportSchema = false)
 @TypeConverters(TypeConvertor::class)
 abstract class AppDatabase: RoomDatabase() {
     abstract fun songDao(): SongDao

@@ -33,7 +33,6 @@ class PlaylistFragment : Fragment() {
             val deviceMusicByPlaylist = playerViewModel.getplayListMusic()
             if (deviceMusicByPlaylist.isNotEmpty()){
                 deviceMusicList.clear()
-                val deviceMusicByPlaylist = playerViewModel.getplayListMusic()
                 deviceMusicList.put("Recently Added", deviceMusicByDate)
                 deviceMusicList.putAll(deviceMusicByPlaylist)
                 deviceMusicList.putAll(deviceMusicByPlaylist)

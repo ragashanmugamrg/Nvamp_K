@@ -31,26 +31,24 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.util.concurrent.ListenableFuture
+import com.google.common.util.concurrent.MoreExecutors
 import kotlinx.coroutines.withContext
 import java.io.File
 
 class Songslistadapter(
     private val mediaitems: MutableList<MediaItem>,
     private val medcontroller: ListenableFuture<MediaController>
-): RecyclerView.Adapter<Songslistadapter.MyViewHolder>() {
+) : RecyclerView.Adapter<Songslistadapter.MyViewHolder>() {
 
 
     var songqueue = mutableListOf<MediaItem>()
 
-    val playlistmap = mutableMapOf<String,List<Song>>()
+    val playlistmap = mutableMapOf<String, List<Song>>()
     val dynamicChoice: Set<String> = playlistmap.keys
 
-    init {
-        playlistmap.putAll(playerViewModel.getplayListMusic())
-    }
 
 
-    inner class MyViewHolder(view: View): RecyclerView.ViewHolder(view) {
+    inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val songTitle: TextView = view.findViewById(R.id.title)
         val songartist: TextView = view.findViewById(R.id.artist)
         val songDuration: TextView = view.findViewById(R.id.duration)
@@ -60,7 +58,8 @@ class Songslistadapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.songs_card_view,parent,false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.songs_card_view, parent, false)
         return MyViewHolder(view)
     }
 
@@ -84,7 +83,7 @@ class Songslistadapter(
             .into(holder.songalbumart)
 
         holder.options.setOnClickListener { v ->
-            showPopupMenu(v,position)
+            showPopupMenu(v, position)
         }
 
 
@@ -92,43 +91,49 @@ class Songslistadapter(
 
 
 
-        holder.itemView.setOnClickListener{
+        holder.itemView.setOnClickListener {
             songqueue.addAll(mediaitems)
 
-            if (medcontroller.isDone){
+            if (medcontroller.isDone && !medcontroller.isCancelled) {
                 var controller = medcontroller.get()
-                controller.setMediaItems(songqueue,position,0)
+                controller.setMediaItems(songqueue, position, 0)
                 controller.play()
                 playerViewModel.setlastplayedpos(position)
             }
+
 
         }
 
     }
 
-    fun showPopupMenu(view: View,position: Int) {
-        val popupMenu = PopupMenu(view.context,view)
+    fun showPopupMenu(view: View, position: Int) {
+        val popupMenu = PopupMenu(view.context, view)
         val inflater: MenuInflater = popupMenu.menuInflater
-        inflater.inflate(R.menu.song_menu,popupMenu.menu)
-        popupMenu.setOnMenuItemClickListener { item -> handleMenuClick(item,position,view) }
+        inflater.inflate(R.menu.song_menu, popupMenu.menu)
+        popupMenu.setOnMenuItemClickListener { item -> handleMenuClick(item, position, view) }
         popupMenu.show()
     }
 
 
     @OptIn(UnstableApi::class)
-    fun handleMenuClick(item:MenuItem,position: Int,view: View): Boolean{
+    fun handleMenuClick(item: MenuItem, position: Int, view: View): Boolean {
         var playlistnames = mutableListOf<String>()
+        playlistmap.putAll(playerViewModel.getplayListMusic())
         dynamicChoice.forEach { name ->
             playlistnames.add(name)
         }
-        return when(item.title){
+        return when (item.title) {
 
             "Play Next" -> {
-                if(songqueue.isNotEmpty()){
+                if (songqueue.isNotEmpty()) {
 
 //                    val lastplayedpos = playerViewModel.getlastplayedpos()
-                    val mediaItem = MediaItem.Builder().setMediaId(mediaitems[position].mediaMetadata.description.toString())
-                        .setUri((mediaitems[position].mediaMetadata.description.toString().let { it -> File(it) }).toUri())
+                    val mediaItem = MediaItem.Builder()
+                        .setMediaId(mediaitems[position].mediaMetadata.description.toString())
+                        .setUri(
+                            (mediaitems[position].mediaMetadata.description.toString()
+                                .let { it -> File(it) }).toUri()
+                        )
                         .setMediaId("MediaStore:id")
                         .setMediaMetadata(
                             MediaMetadata.Builder()
@@ -141,12 +146,16 @@ class Songslistadapter(
                         ).build()
 //                    songqueue.add(lastplayedpos,mediaItem.build())
                     var controller = medcontroller.get()
-                    controller.addMediaItem(medcontroller.get().currentMediaItemIndex+1,mediaItem)
+                    controller.addMediaItem(
+                        medcontroller.get().currentMediaItemIndex + 1,
+                        mediaItem
+                    )
                     controller.prepare()
 
                 }
                 return true
             }
+
             "Add to Playlist" -> {
                 MaterialAlertDialogBuilder(view.context)
                     .setTitle("Save")
@@ -178,7 +187,7 @@ class Songslistadapter(
                                 )
                                 var newplaylist = mutableListOf<Song>()
                                 newplaylist.add(playlist)
-                                playlistmap.put(playlistname.toString(),newplaylist)
+                                playlistmap.put(playlistname.toString(), newplaylist)
                                 playerViewModel.setplayListMusic(playlistmap)
                                 PlaylistFragment.playernotify()
                             }
@@ -187,12 +196,15 @@ class Songslistadapter(
                     .setNegativeButton("cancle") { dialog, which ->
                         dialog.dismiss()
                     }
-                    .setPositiveButton("ok",{ dialog: DialogInterface?, which: Int ->
+                    .setPositiveButton("ok", { dialog: DialogInterface?, which: Int ->
                         PlaylistFragment.playernotify()
                     })
-                    .setMultiChoiceItems(playlistnames.toTypedArray(), null){ dialog, which, ischecked ->
+                    .setMultiChoiceItems(
+                        playlistnames.toTypedArray(),
+                        null
+                    ) { dialog, which, ischecked ->
                         val selectedItem = playlistnames[which]
-                        if(ischecked) {
+                        if (ischecked) {
                             val playlist = Song(
                                 mediaitems[position].mediaMetadata.title.toString(),
                                 mediaitems[position].mediaMetadata.artist.toString(),
@@ -211,19 +223,20 @@ class Songslistadapter(
                             )
                             var newplaylist = mutableListOf<Song>()
                             val play = playlistmap.get(selectedItem)?.toMutableList()
-                            if (play!=null){
+                            if (play != null) {
                                 play.forEach { data ->
                                     newplaylist.add(data)
                                 }
                             }
                             newplaylist.add(playlist)
-                            playlistmap.put(selectedItem,newplaylist)
+                            playlistmap.put(selectedItem, newplaylist)
                             playerViewModel.setplayListMusic(playlistmap)
                         }
                     }
                     .show()
                 return true
             }
+
             else -> false
         }
     }

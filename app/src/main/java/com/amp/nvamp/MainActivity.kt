@@ -27,6 +27,7 @@ import com.amp.nvamp.fragments.FolderFragment
 import com.amp.nvamp.fragments.GenerFragment
 import com.amp.nvamp.fragments.HomeFragment
 import com.amp.nvamp.fragments.MusicLibrary
+import com.amp.nvamp.fragments.PlaylistFragment
 import com.amp.nvamp.fragments.ViewPagerFragment.Companion.loaderview
 import com.amp.nvamp.playback.PlaybackService
 import com.amp.nvamp.utils.NvampUtils
@@ -69,11 +70,15 @@ class MainActivity : AppCompatActivity() {
         permissionRequest()
 
 
-
         playerViewModel = ViewModelProvider(this)[PlayerViewModel::class.java]
 
+        medcontroller = MediaController.Builder(
+            this,
+            SessionToken(this, ComponentName(this, PlaybackService::class.java)),
+        ).buildAsync()
 
         lifecycleScope.launch {
+
             PlayerViewModel(application).initialized()
             HomeFragment.playernotify()
             MusicLibrary.playernotify()
@@ -85,11 +90,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         customFragmentManager = supportFragmentManager
-
-        medcontroller = MediaController.Builder(
-            this,
-            SessionToken(this, ComponentName(this, PlaybackService::class.java)),
-        ).buildAsync()
 
         medcontroller.addListener(
             {

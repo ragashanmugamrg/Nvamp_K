@@ -1,8 +1,12 @@
 package com.amp.nvamp.storagesystem.data;
 
 import android.net.Uri
+import androidx.annotation.NonNull
+import androidx.annotation.Nullable
 import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.Junction
 import androidx.room.PrimaryKey
 import androidx.room.Relation
@@ -12,7 +16,6 @@ import com.amp.nvamp.data.Song
     tableName = "songs"
 )
 data class SongEntity(
-    @PrimaryKey(autoGenerate = true) val songid: Int = 0,
     val title: String,
     val artist: String,
     val duration: Long?,
@@ -23,7 +26,7 @@ data class SongEntity(
     val imgUri: Uri,
     val year: String?,
     val gener: String?,
-    val id: String?,
+    @PrimaryKey val id: String,
     val date: Int?,
     val count: Int?,
     val last_modifiy_dt: Long?
@@ -51,24 +54,41 @@ fun Song.toEntity(): SongEntity {
 
 
 
-@Entity(tableName = "playlist")
+@Entity(tableName = "playlist", indices = [Index(value = ["playlistname"], unique = true)])
 data class PlaylistEntity(
     @PrimaryKey(autoGenerate = true) val playlistid: Int = 0,
     val playlistname: String,
 )
 
 
-@Entity(primaryKeys = ["playlistid","songid"])
+@Entity(
+    tableName = "playlist_cross_ref",
+    primaryKeys = ["playlistid", "id"],
+    foreignKeys = [
+        ForeignKey(
+            entity = PlaylistEntity::class,
+            parentColumns = ["playlistid"],
+            childColumns = ["playlistid"],
+            onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = SongEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["id"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
+)
 data class PlaylistCrossRef(
     val playlistid: Int,
-    val songid: Int
+    val id: String
 )
 
 
 data class PlaylistWithsongs(
     @Embedded val playlist: PlaylistEntity,
     @Relation(parentColumn = "playlistid",
-        entityColumn = "songid",
+        entityColumn = "id",
         associateBy = Junction(PlaylistCrossRef::class)
     )
     val playlists: List<SongEntity>
