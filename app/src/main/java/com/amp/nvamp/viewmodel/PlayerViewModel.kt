@@ -24,10 +24,11 @@ import java.io.File
 
 class PlayerViewModel(application: Application) : AndroidViewModel(application) {
 
-    var songs = mutableListOf<Song>()
+
     private val storageRepo = StorageRepository(application)
 
     companion object {
+        var songs = mutableListOf<Song>()
         var mediaitems = mutableListOf<MediaItem>()
 
         var deviceMusicByAlbum: Map<String, List<Song>> = mutableMapOf()
@@ -214,6 +215,14 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         StoragePrefrence().putLastplayedpos(value)
     }
 
+    fun setLastPlayedms(value: Long){
+        StoragePrefrence().putLastPlayedms(value)
+    }
+
+    fun getLastPlayedms(): Long {
+        return StoragePrefrence().getLastPlayedms()!!
+    }
+
     fun getlastplayedpos():Int{
         lastplayedposition = StoragePrefrence().getLastplayedpos()
         return lastplayedposition
@@ -222,15 +231,19 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
     fun setplayListMusic(playList: Map<String, List<Song>>) {
         viewModelScope.launch {
-            storageRepo.savealltheplaylist(playList)
+            StoragePrefrence().putplayListMusic(playList)
         }
     }
 
     fun getplayListMusic(): Map<String, List<Song>> {
         viewModelScope.launch {
-            playListMusic = storageRepo.getalltheplaylist()
+            playListMusic = StoragePrefrence().getplayListMusic()
         }
         return playListMusic
+    }
+
+    fun saveDarkMode(mode: Int){
+        StoragePrefrence().saveMode(mode)
     }
 
 }

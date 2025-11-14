@@ -64,7 +64,6 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("ResourceType", "MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        DynamicColors.applyToActivityIfAvailable(this)
         enableEdgeToEdge()
 
         permissionRequest()
@@ -96,7 +95,8 @@ class MainActivity : AppCompatActivity() {
                 if (medcontroller.isDone) {
                     controller = medcontroller.get()
                     playerViewModel.getlastplayedpos()
-                    controller.setMediaItems(mediaitems, playerViewModel.getlastplayedpos(),0L)
+                    controller.setMediaItems(mediaitems, playerViewModel.getlastplayedpos(),
+                        playerViewModel.getLastPlayedms())
                 }
             }, MoreExecutors.directExecutor()
         )

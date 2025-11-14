@@ -1,4 +1,4 @@
-package com.amp.nvamp
+package com.amp.nvamp.widgets
 
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -6,7 +6,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
-import com.amp.nvamp.playback.PlaybackService
+import com.amp.nvamp.R
 
 
 class NvampApp : AppWidgetProvider() {

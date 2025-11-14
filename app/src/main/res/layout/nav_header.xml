@@ -21,7 +21,6 @@
         android:id="@+id/materialDivider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:dividerColor="@android:color/white"
         app:dividerInsetEnd="0dp"
         app:dividerInsetStart="0dp"
         app:layout_constraintBottom_toBottomOf="parent"

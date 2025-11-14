@@ -25,7 +25,7 @@
             android:exported="false" />
 
         <receiver
-            android:name=".NvampApp"
+            android:name=".widgets.NvampApp"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -46,7 +46,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MiniplayerActivity"
+            android:name=".widgets.MiniplayerActivity"
             android:exported="true"
             android:theme="@style/Theme.Nvamp.Miniplayer">
             <intent-filter>

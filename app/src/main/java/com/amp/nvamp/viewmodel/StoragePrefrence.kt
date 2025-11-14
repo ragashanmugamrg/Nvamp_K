@@ -33,6 +33,21 @@ class StoragePrefrence {
     }
 
 
+    fun putLastPlayedms(value: Long){
+        sp?.edit()?.putLong("LastPlayedms",value)
+    }
+
+
+    fun getLastPlayedms() = sp?.getLong("LastPlayedms",0L)
+
+
+    fun saveMode(mode: Int) {
+        sp?.edit()
+            ?.putInt("theme_mode", mode)
+            ?.apply()
+    }
+
+
     fun putLastplayedpos(lastPlayedPosition: Int) {
         print(lastPlayedPosition)
         sp?.edit()?.putInt("lastplayedpos", lastPlayedPosition)?.apply()
@@ -76,6 +91,8 @@ class StoragePrefrence {
         val json = jsonAdapter?.toJson(value)
         sp!!.edit().putString("lastsongdata", json).apply()
     }
+
+
 
 
     fun getlastplayed(): MutableList<Song> {

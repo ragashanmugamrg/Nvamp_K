@@ -7,7 +7,7 @@
     android:background="@android:color/transparent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MiniplayerActivity">
+    tools:context=".widgets.MiniplayerActivity">
 
 
   <androidx.constraintlayout.widget.ConstraintLayout

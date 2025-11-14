@@ -13,11 +13,14 @@ import androidx.core.widget.addTextChangedListener
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.MediaItem
 import androidx.viewpager2.widget.ViewPager2
 import com.amp.nvamp.MainActivity
 import com.amp.nvamp.MainActivity.Companion.medcontroller
 import com.amp.nvamp.R
 import com.amp.nvamp.adapter.Folderlistadapter
+import com.amp.nvamp.adapter.Songslistadapter
+import com.amp.nvamp.data.Song
 import com.amp.nvamp.playback.PlaybackService.Companion.sessionId
 import com.amp.nvamp.settings.NvampPlayerSettings
 import com.google.android.material.appbar.MaterialToolbar
@@ -30,6 +33,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
+import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.mediaitems
+import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.songs
 
 
 class ViewPagerFragment : Fragment() {
@@ -41,8 +46,12 @@ class ViewPagerFragment : Fragment() {
     private lateinit var navigationview: NavigationView
     private lateinit var drawerLayout: DrawerLayout
 
+    lateinit var adapter: Songslistadapter
     private lateinit var searchBar: SearchBar
     private lateinit var searchView: SearchView
+
+    private var allSongs: List<Song> = songs
+    private var filteredSongs: MutableList<Song> = mutableListOf()
     companion object{
         lateinit var loaderview: MaterialCardView
     }
@@ -102,6 +111,19 @@ class ViewPagerFragment : Fragment() {
         // 🔍 Handle search text changes
         searchView.editText.addTextChangedListener { text ->
 
+//            val query = text.toString().lowercase()
+//
+//            filteredSongs = if (query.isEmpty()) {
+//                allSongs.toMutableList()
+//                else{
+//                    allSongs.filter { song ->
+//                        song.title.lowercase().contains(query) || song.artist.lowercase()
+//                            .contains(query)
+//                    }.toMutableList()
+//                }
+//            }
+//
+//            adapter.submit
         }
 
         toolbar.setNavigationOnClickListener {

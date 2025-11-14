@@ -47,8 +47,12 @@
             android:layout_height="wrap_content"
             android:text="albumname"
             android:gravity="start"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
             android:layout_gravity="center_horizontal"
-            android:textSize="15sp"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
     </LinearLayout>

@@ -145,6 +145,7 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
         override fun run() {
             if (controller.isPlaying) {
                 slider.value = controller.currentPosition.toFloat()
+
             }
             ahandler.postDelayed(this, 500)
         }
@@ -180,7 +181,7 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
             {
                 if (mediaController.isDone) {
                     controller = mediaController.get()
-                    controller.setMediaItems(mediaitems, playerViewModel.getlastplayedpos(),0L)
+                    controller.setMediaItems(mediaitems, playerViewModel.getlastplayedpos(),playerViewModel.getLastPlayedms())
                     controller.addListener(object : Player.Listener {
                         override fun onIsPlayingChanged(isPlaying: Boolean) {
                             super.onIsPlayingChanged(isPlaying)
@@ -247,10 +248,12 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
 
         nextbutton.setOnClickListener {
             controller.seekToNext()
+            playerViewModel.setlastplayedpos(controller.currentMediaItemIndex)
         }
 
         previousbutton.setOnClickListener {
             controller.seekToPrevious()
+            playerViewModel.setlastplayedpos(controller.currentMediaItemIndex)
         }
 
         shuffleMode.setOnClickListener {
@@ -418,6 +421,8 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
             .into(minialbumart)
 
         slider.valueTo = mediaMetadata.durationMs?.toFloat() ?: 0f
+
+        playerViewModel.setlastplayedpos(controller.currentMediaItemIndex)
 
     }
 

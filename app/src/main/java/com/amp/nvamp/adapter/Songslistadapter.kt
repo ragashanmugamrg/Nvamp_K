@@ -1,6 +1,5 @@
 package com.amp.nvamp.adapter
 
-import android.content.Context
 import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.MenuInflater
@@ -13,15 +12,12 @@ import android.widget.TextView
 import androidx.annotation.OptIn
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.net.toUri
-import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
 import androidx.recyclerview.widget.RecyclerView
 import com.amp.nvamp.MainActivity.Companion.playerViewModel
-import com.amp.nvamp.NvampApp
-import com.amp.nvamp.NvampApplication
 import com.amp.nvamp.R
 import com.amp.nvamp.data.Song
 import com.amp.nvamp.fragments.PlaylistFragment
@@ -31,8 +27,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.util.concurrent.ListenableFuture
-import com.google.common.util.concurrent.MoreExecutors
-import kotlinx.coroutines.withContext
 import java.io.File
 
 class Songslistadapter(
@@ -96,7 +90,7 @@ class Songslistadapter(
 
             if (medcontroller.isDone && !medcontroller.isCancelled) {
                 var controller = medcontroller.get()
-                controller.setMediaItems(songqueue, position, 0)
+                controller.setMediaItems(songqueue, position, playerViewModel.getLastPlayedms())
                 controller.play()
                 playerViewModel.setlastplayedpos(position)
             }
