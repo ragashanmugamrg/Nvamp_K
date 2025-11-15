@@ -145,7 +145,7 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
         override fun run() {
             if (controller.isPlaying) {
                 slider.value = controller.currentPosition.toFloat()
-
+                playerViewModel.setLastPlayedms((slider.value).toLong())
             }
             ahandler.postDelayed(this, 500)
         }
@@ -159,6 +159,7 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
         override fun onStopTrackingTouch(slider: Slider) {
             if (controller.currentMediaItem != null) {
                 controller.seekTo(((slider.value).toLong()))
+                playerViewModel.setLastPlayedms((slider.value).toLong())
             }
         }
     }
@@ -298,6 +299,7 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
 
         slider.addOnChangeListener(Slider.OnChangeListener { slider, value, fromUser ->
             leftduration.text = NvampUtils().formatDuration(value.toLong())
+            playerViewModel.setLastPlayedms(value.toLong())
         })
 
         appBar.setNavigationOnClickListener {
