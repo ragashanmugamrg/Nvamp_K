@@ -52,10 +52,10 @@ class ViewPagerFragment : Fragment() {
 
     private var allSongs: List<Song> = songs
     private var filteredSongs: MutableList<Song> = mutableListOf()
-    companion object{
+
+    companion object {
         lateinit var loaderview: MaterialCardView
     }
-
 
 
     override fun onCreateView(
@@ -91,9 +91,8 @@ class ViewPagerFragment : Fragment() {
 
         fragmentContainer.offscreenPageLimit = 6
 
-        TabLayoutMediator(tabLayout,fragmentContainer){
-                tab, position ->
-            tab.text = when(position){
+        TabLayoutMediator(tabLayout, fragmentContainer) { tab, position ->
+            tab.text = when (position) {
                 0 -> "Songs"
                 1 -> "Albums"
                 2 -> "Folder"
@@ -139,7 +138,7 @@ class ViewPagerFragment : Fragment() {
                     startActivity(settingsintent)
                 }
 
-                R.id.refreshd-> { /* Handle Settings */
+                R.id.refreshd -> { /* Handle Settings */
                     lifecycleScope.launch {
                         loaderview.visibility = VISIBLE
                         MainActivity.playerViewModel.refreshdatainpref()
@@ -166,42 +165,42 @@ class ViewPagerFragment : Fragment() {
         }
 
 
-        toolbar.setOnMenuItemClickListener { menuItem ->
-            if (menuItem.title == "Refresh"){
-                lifecycleScope.launch {
-                    loaderview.visibility = VISIBLE
-                    MainActivity.playerViewModel.refreshdatainpref()
-                    HomeFragment.playernotify()
-                    MusicLibrary.playernotify()
-                    FolderFragment.playernotify()
-                    ArtistFragment.playernotify()
-                    GenerFragment.playernotify()
-                    PlaylistFragment.playernotify()
-                    loaderview.visibility = GONE
-
-
-                    Snackbar.make(view, "All Songs Refreshed from disk", Snackbar.ANIMATION_MODE_FADE)
-                        .show()
-
-                }
-                return@setOnMenuItemClickListener true
-            }else if (menuItem.title == "Settings"){
-                val settingsintent = Intent(context,NvampPlayerSettings::class.java)
-                startActivity(settingsintent)
-            }else if (menuItem.title == "Equalizer"){
-                val intent: Intent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL).apply {
-                    putExtra(AudioEffect.EXTRA_AUDIO_SESSION, sessionId)
-                    putExtra(AudioEffect.EXTRA_PACKAGE_NAME, requireContext().packageName)
-                    putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC)
-                }
-
-                requireContext().startActivity(intent)
-
-                return@setOnMenuItemClickListener true
-            }
-
-            return@setOnMenuItemClickListener false
-        }
+//        toolbar.setOnMenuItemClickListener { menuItem ->
+//            if (menuItem.title == "Refresh"){
+//                lifecycleScope.launch {
+//                    loaderview.visibility = VISIBLE
+//                    MainActivity.playerViewModel.refreshdatainpref()
+//                    HomeFragment.playernotify()
+//                    MusicLibrary.playernotify()
+//                    FolderFragment.playernotify()
+//                    ArtistFragment.playernotify()
+//                    GenerFragment.playernotify()
+//                    PlaylistFragment.playernotify()
+//                    loaderview.visibility = GONE
+//
+//
+//                    Snackbar.make(view, "All Songs Refreshed from disk", Snackbar.ANIMATION_MODE_FADE)
+//                        .show()
+//
+//                }
+//                return@setOnMenuItemClickListener true
+//            }else if (menuItem.title == "Settings"){
+//                val settingsintent = Intent(context,NvampPlayerSettings::class.java)
+//                startActivity(settingsintent)
+//            }else if (menuItem.title == "Equalizer"){
+//                val intent: Intent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL).apply {
+//                    putExtra(AudioEffect.EXTRA_AUDIO_SESSION, sessionId)
+//                    putExtra(AudioEffect.EXTRA_PACKAGE_NAME, requireContext().packageName)
+//                    putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC)
+//                }
+//
+//                requireContext().startActivity(intent)
+//
+//                return@setOnMenuItemClickListener true
+//            }
+//
+//            return@setOnMenuItemClickListener false
+//        }
 
     }
 }

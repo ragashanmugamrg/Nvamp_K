@@ -4,6 +4,7 @@ package com.amp.nvamp.bottombar
 import android.content.ComponentName
 import android.content.Context
 import android.content.DialogInterface
+import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
@@ -17,6 +18,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.PlayerMessage
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.amp.nvamp.MainActivity
@@ -31,6 +33,7 @@ import com.amp.nvamp.utils.NvampUtils
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.mediaitems
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.target.Target
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -403,6 +406,14 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
 
     @OptIn(UnstableApi::class)
     fun updatemetadata(mediaMetadata: MediaMetadata) {
+
+
+        val albumId = mediaMetadata.extras?.getLong("ALBUM_ID")
+
+        val highResUri = albumId?.let {
+            Uri.parse("content://media/external/audio/albumart/$albumId")
+        }
+
         title.text = mediaMetadata.title
         artist.text = mediaMetadata.artist
         minititle.text = mediaMetadata.title
@@ -411,13 +422,14 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
         rightduration.text = mediaMetadata.durationMs?.let { NvampUtils().formatDuration(it) }
 
         Glide.with(NvampApplication.context)
-            .load(mediaMetadata.artworkUri)
+            .load(highResUri ?: mediaMetadata.artworkUri)
+            .override(Target.SIZE_ORIGINAL)
             .placeholder(R.drawable.ic_songs_foreground)
             .diskCacheStrategy(DiskCacheStrategy.NONE)
             .into(albumart)
 
         Glide.with(NvampApplication.context)
-            .load(mediaMetadata.artworkUri)
+            .load(highResUri ?: mediaMetadata.artworkUri)
             .placeholder(R.drawable.ic_songs_foreground)
             .diskCacheStrategy(DiskCacheStrategy.NONE)
             .into(minialbumart)
@@ -438,9 +450,5 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
         }
     }
 
-
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-    }
 
 }

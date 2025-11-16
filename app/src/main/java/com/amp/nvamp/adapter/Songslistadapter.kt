@@ -64,6 +64,7 @@ class Songslistadapter(
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         holder.songTitle.text = mediaitems[position].mediaMetadata.title
         holder.songartist.text = mediaitems[position].mediaMetadata.artist
+
         holder.songDuration.text = mediaitems[position].mediaMetadata.durationMs?.let {
             NvampUtils().formatDuration(
                 it

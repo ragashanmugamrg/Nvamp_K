@@ -26,15 +26,15 @@ data class Song(
 
 fun SongEntity.toSongs(): Song {
     return Song(
-        id = this.id ?: "",
-        title = this.title ?: "",
-        artist = this.artist ?: "",
-        album = this.album ?: "",
+        id = this.id,
+        title = this.title,
+        artist = this.artist,
+        album = this.album,
         duration = this.duration ?: 0L,
-        data = this.data ?: "",
-        foldername = this.folder_name ?: "",
-        album_id = this.album_id ?: 0L,
-        imgUri = this.imgUri?: Uri.EMPTY,
+        data = this.data,
+        foldername = this.folder_name,
+        album_id = this.album_id,
+        imgUri = this.imgUri,
         year = this.year ?: "",
         gener = this.gener ?: "",
         date = this.date ?: 0,

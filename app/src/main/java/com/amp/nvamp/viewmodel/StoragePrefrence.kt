@@ -29,7 +29,7 @@ class StoragePrefrence {
             .add(UriParser())
             .build()
 
-        types = Types.newParameterizedType(MutableList::class.java,Song::class.java)
+        types = Types.newParameterizedType(MutableList::class.java,MediaItem::class.java)
     }
 
 
@@ -54,7 +54,7 @@ class StoragePrefrence {
     }
 
     fun getLastplayedpos(): Int {
-        print((" lastplayed pos" + sp?.getInt("lastplayedpos", 0)) ?: 0)
+        print((" lastplayed pos" + sp?.getInt("lastplayedpos", 0)))
         return sp?.getInt("lastplayedpos", 0) ?: 0
     }
 
@@ -85,11 +85,11 @@ class StoragePrefrence {
     }
 
 
-    fun putlastplayed(value: MutableList<Song>?) {
+    fun putLastPlayedMedia(media: MutableList<MediaItem>?,value: Int, position: Long ) {
         val jsonAdapter =
-            types?.let { moshi?.adapter<List<Song>>(it) }
-        val json = jsonAdapter?.toJson(value)
-        sp!!.edit().putString("lastsongdata", json).apply()
+            types?.let { moshi?.adapter<List<MediaItem>>(it) }
+        val json = jsonAdapter?.toJson(media)
+        sp!!.edit().putString("LastMediaItems", json).apply()
     }
 
 

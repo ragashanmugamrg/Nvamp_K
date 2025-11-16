@@ -2,6 +2,7 @@ package com.amp.nvamp.utils
 
 import androidx.annotation.OptIn
 import androidx.core.net.toUri
+import androidx.core.os.bundleOf
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
@@ -20,27 +21,23 @@ class NvampUtils {
     }
 
     @OptIn(UnstableApi::class)
-    fun changeSongmodeltoMediaitem(listofsongs: List<Song>?): MutableList<MediaItem>{
-        var mediasongs = mutableListOf<MediaItem>()
-        //playerViewModel.setlastplayedmedia(listofsongs!!.toMutableList())
-        if (listofsongs!!.isNotEmpty()) {
-            listofsongs.forEach { data ->
-                val mediaItem = MediaItem.Builder().setMediaId(data.data)
-                    .setUri((data.data.let { it -> File(it) }).toUri())
-                    .setMediaId("MediaStore:$data.id")
-                    .setMediaMetadata(
-                        MediaMetadata.Builder()
-                            .setTitle(data.title)
-                            .setArtist(data.artist)
-                            .setDurationMs(data.duration)
-                            .setArtworkUri(data.imgUri)
-                            .setDescription(data.data)
-                            .build()
+    fun changeSongmodeltoMediaitem(data: Song): MediaItem.Builder {
+        return MediaItem.Builder().setMediaId(data.data)
+            .setUri((data.data.let { File(it) }).toUri())
+            .setMediaId("MediaStore:$data.id")
+            .setMediaMetadata(
+                MediaMetadata.Builder()
+                    .setTitle(data.title)
+                    .setArtist(data.artist)
+                    .setDurationMs(data.duration)
+                    .setArtworkUri(data.imgUri)
+                    .setDescription(data.data)
+                    .setExtras(
+                        bundleOf(
+                            "ALBUM_ID" to data.album_id       // <-- Add this
+                        )
                     )
-                mediasongs.add(mediaItem.build())
-            }
-        }
-
-        return mediasongs
+                    .build()
+            )
     }
 }

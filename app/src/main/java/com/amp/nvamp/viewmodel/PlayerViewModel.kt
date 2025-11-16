@@ -17,6 +17,7 @@ import androidx.media3.common.util.UnstableApi
 import com.amp.nvamp.NvampApplication
 import com.amp.nvamp.data.Album
 import com.amp.nvamp.data.Song
+import com.amp.nvamp.utils.NvampUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -45,7 +46,6 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     }
 
 
-
     @OptIn(UnstableApi::class)
     suspend fun refreshdatainpref() {
         withContext(Dispatchers.IO) {
@@ -60,25 +60,11 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             songs = storageRepo.getAllSongs().toMutableList()
             if (songs.isNotEmpty()) {
                 songs.forEach { data ->
-                    val mediaItem = MediaItem.Builder().setMediaId(data.data)
-                        .setUri((data.data.let { File(it) }).toUri())
-                        .setMediaId("MediaStore:$data.id")
-                        .setMediaMetadata(
-                            MediaMetadata.Builder()
-                                .setTrackNumber(data.count)
-                                .setTitle(data.title)
-                                .setArtist(data.artist)
-                                .setDurationMs(data.duration)
-                                .setArtworkUri(data.imgUri)
-                                .setGenre(data.gener)
-                                .setDescription(data.data)
-                                .build()
-                        )
+                    val mediaItem = NvampUtils().changeSongmodeltoMediaitem(data)
                     mediaitems.add(mediaItem.build())
                 }
             } else {
                 dataIniziser()
-                //storageRepo.saveAllSongs(songs)
             }
             updateCategorize(songs)
         }
@@ -146,7 +132,8 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
                 val file = File(data)
                 if (adddate.equals(0))
-                    adddate = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED))
+                    adddate =
+                        cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED))
 
                 val foldername = data.replace(display_name, "")
 
@@ -173,7 +160,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
                     album_id,
                     imgUri,
                     year,
-                    gener?: "Unknown",
+                    gener ?: "Unknown",
                     id,
                     adddate,
                     count,
@@ -181,21 +168,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
                 )
                 songs.add(song)
 
-                val mediaItem = MediaItem.Builder().setMediaId(data)
-                    .setUri(pathFile?.toUri())
-                    .setMediaId("MediaStore:$id")
-                    .setMediaMetadata(
-                        MediaMetadata.Builder()
-                            .setTrackNumber(count)
-                            .setTitle(title)
-                            .setArtist(artist)
-                            .setArtworkUri(imgUri)
-                            .setDurationMs(duration)
-                            .setGenre(gener)
-                            .setDescription(data)
-                            .build()
-                    )
-
+                val mediaItem = NvampUtils().changeSongmodeltoMediaitem(song)
                 mediaitems.add(mediaItem.build())
             }
         }
@@ -203,7 +176,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         storageRepo.saveAllSongs(songs)
     }
 
-    fun updateCategorize(songs: MutableList<Song>){
+    fun updateCategorize(songs: MutableList<Song>) {
         deviceMusicByAlbum = songs.groupBy { it.album }
         deviceMusicByFolder = songs.groupBy { it.foldername }
         deviceMusicByArtist = songs.groupBy { it.artist }
@@ -211,11 +184,13 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         deviceMusicByGener = songs.groupBy { it.gener ?: "Unknown" }
     }
 
+
+
     fun setlastplayedpos(value: Int) {
         StoragePrefrence().putLastplayedpos(value)
     }
 
-    fun setLastPlayedms(value: Long){
+    fun setLastPlayedms(value: Long) {
         StoragePrefrence().putLastPlayedms(value)
     }
 
@@ -223,7 +198,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         return StoragePrefrence().getLastPlayedms()!!
     }
 
-    fun getlastplayedpos():Int{
+    fun getlastplayedpos(): Int {
         lastplayedposition = StoragePrefrence().getLastplayedpos()
         return lastplayedposition
     }
@@ -242,7 +217,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         return playListMusic
     }
 
-    fun saveDarkMode(mode: Int){
+    fun saveDarkMode(mode: Int) {
         StoragePrefrence().saveMode(mode)
     }
 

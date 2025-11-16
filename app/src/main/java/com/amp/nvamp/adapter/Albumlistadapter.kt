@@ -6,8 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.replace
 import androidx.media3.session.MediaController
 import androidx.recyclerview.widget.RecyclerView
 import com.amp.nvamp.MainActivity.Companion.customFragmentManager
@@ -19,18 +17,20 @@ import com.google.common.util.concurrent.ListenableFuture
 
 class Albumlistadapter(
     private val albumitems: Map<String, List<Song>>,
-    private val medcontroller: ListenableFuture<MediaController>) :
+    private val medcontroller: ListenableFuture<MediaController>
+) :
     RecyclerView.Adapter<Albumlistadapter.MyViewHolder>() {
 
 
-    inner class MyViewHolder(view: View): RecyclerView.ViewHolder(view){
+    inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val albumTitle: TextView = view.findViewById(R.id.albumsongsname)
         val albumart: ImageView = view.findViewById(R.id.albumartimage)
 
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        var view = LayoutInflater.from(parent.context).inflate(R.layout.album_card_view,parent,false)
+        var view =
+            LayoutInflater.from(parent.context).inflate(R.layout.album_card_view, parent, false)
         return MyViewHolder(view)
     }
 
@@ -45,25 +45,27 @@ class Albumlistadapter(
         holder.albumTitle.text = sortalbumnames[position]
         try {
             Glide.with(holder.albumart.context)
-                .load("content://media/external/audio/albumart/"+
-                        albumitems.get(sortalbumnames[position])?.get(0)?.album_id)
+                .load(
+                    "content://media/external/audio/albumart/" +
+                            albumitems.get(sortalbumnames[position])?.get(0)?.album_id
+                )
                 .placeholder(R.drawable.ic_songs_foreground)
                 .into(holder.albumart)
-        }catch (_: Exception){
+        } catch (_: Exception) {
 
         }
 
         val bundle = Bundle().apply {
-            putInt("position",position)
-            putString("albumname",sortalbumnames[position])
-            putString("fromfragment","album")
+            putInt("position", position)
+            putString("albumname", sortalbumnames[position])
+            putString("fromfragment", "album")
         }
         val albumSongList = AlbumSongList().apply {
             arguments = bundle
         }
 
         holder.itemView.setOnClickListener {
-            customFragmentManager.beginTransaction().replace(R.id.fragmentcontainer,albumSongList)
+            customFragmentManager.beginTransaction().replace(R.id.fragmentcontainer, albumSongList)
                 .addToBackStack(null)
                 .commit()
         }

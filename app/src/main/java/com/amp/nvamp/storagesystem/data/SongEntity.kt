@@ -1,4 +1,4 @@
-package com.amp.nvamp.storagesystem.data;
+package com.amp.nvamp.storagesystem.data
 
 import android.net.Uri
 import androidx.annotation.NonNull
@@ -34,15 +34,15 @@ data class SongEntity(
 
 fun Song.toEntity(): SongEntity {
     return SongEntity(
-        id = this.id ?: "",
-        title = this.title ?: "",
-        artist = this.artist ?: "",
-        album = this.album ?: "",
+        id = this.id,
+        title = this.title,
+        artist = this.artist,
+        album = this.album,
         duration = this.duration ?: 0L,
-        data = this.data ?: "",
-        folder_name = this.foldername ?: "",
-        album_id = this.album_id ?: 0L,
-        imgUri = this.imgUri?: Uri.EMPTY,
+        data = this.data,
+        folder_name = this.foldername,
+        album_id = this.album_id,
+        imgUri = this.imgUri,
         year = this.year ?: "",
         gener = this.gener ?: "",
         date = this.date ?: 0,

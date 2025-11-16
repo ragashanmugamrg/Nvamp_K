@@ -188,14 +188,6 @@ class PlaybackService : MediaSessionService(), Player.Listener, AudioManager.OnA
         }
     }
 
-    override fun onPlaybackStateChanged(playbackState: Int) {
-        super.onPlaybackStateChanged(playbackState)
-    }
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        return super.onStartCommand(intent, flags, startId)
-    }
-
     fun successfullyRetrievedAudioFocus(): Boolean {
         val audioManager: AudioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val audioAttributes = android.media.AudioAttributes.Builder()
