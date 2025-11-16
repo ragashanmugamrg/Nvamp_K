@@ -1,6 +1,7 @@
 package com.amp.nvamp.viewmodel
 
 import android.app.Application
+import android.content.ComponentName
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.net.Uri
@@ -14,10 +15,14 @@ import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.session.MediaController
+import androidx.media3.session.SessionToken
 import com.amp.nvamp.NvampApplication
 import com.amp.nvamp.data.Album
 import com.amp.nvamp.data.Song
+import com.amp.nvamp.playback.PlaybackService
 import com.amp.nvamp.utils.NvampUtils
+import com.google.common.util.concurrent.MoreExecutors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -45,6 +50,19 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
     }
 
+    val controllerFuture = MediaController.Builder(
+        application,
+        SessionToken(application, ComponentName(application, PlaybackService::class.java))
+    ).buildAsync()
+
+    lateinit var controller: MediaController
+
+
+    init {
+        controllerFuture.addListener({
+            controller = controllerFuture.get()
+        }, MoreExecutors.directExecutor())
+    }
 
     @OptIn(UnstableApi::class)
     suspend fun refreshdatainpref() {
@@ -190,11 +208,11 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         StoragePrefrence().putLastplayedpos(value)
     }
 
-    fun setLastPlayedms(value: Long) {
+    fun setLastPlayedms(value: Float) {
         StoragePrefrence().putLastPlayedms(value)
     }
 
-    fun getLastPlayedms(): Long {
+    fun getLastPlayedms(): Float {
         return StoragePrefrence().getLastPlayedms()!!
     }
 

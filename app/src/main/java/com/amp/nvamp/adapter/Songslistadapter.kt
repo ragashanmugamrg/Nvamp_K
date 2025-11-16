@@ -91,7 +91,8 @@ class Songslistadapter(
 
             if (medcontroller.isDone && !medcontroller.isCancelled) {
                 var controller = medcontroller.get()
-                controller.setMediaItems(songqueue, position, playerViewModel.getLastPlayedms())
+                controller.setMediaItems(songqueue, position, playerViewModel.getLastPlayedms().toLong())
+                controller.prepare()
                 controller.play()
                 playerViewModel.setlastplayedpos(position)
             }

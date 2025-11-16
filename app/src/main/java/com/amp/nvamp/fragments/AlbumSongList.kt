@@ -12,7 +12,6 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.amp.nvamp.MainActivity.Companion.medcontroller
 import com.amp.nvamp.MainActivity.Companion.playerViewModel
 import com.amp.nvamp.adapter.Songslistadapter
 import com.amp.nvamp.data.Song
@@ -82,7 +81,7 @@ class AlbumSongList : Fragment() {
 
         val layoutManager = LinearLayoutManager(requireContext())
         libraryListView?.layoutManager = layoutManager
-        adapter = Songslistadapter(listofAlbumsongs, medcontroller)
+        adapter = Songslistadapter(listofAlbumsongs, playerViewModel.controllerFuture)
         libraryListView?.adapter = adapter
 
         return albumsonglistbinding?.root

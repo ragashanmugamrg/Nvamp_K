@@ -33,12 +33,12 @@ class StoragePrefrence {
     }
 
 
-    fun putLastPlayedms(value: Long){
-        sp?.edit()?.putLong("LastPlayedms",value)
+    fun putLastPlayedms(value: Float){
+        sp?.edit()?.putFloat("LastPlayedms",value)?.apply()
     }
 
 
-    fun getLastPlayedms() = sp?.getLong("LastPlayedms",0L)
+    fun getLastPlayedms() = sp?.getFloat("LastPlayedms",0f)
 
 
     fun saveMode(mode: Int) {

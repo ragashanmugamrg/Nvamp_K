@@ -107,7 +107,7 @@ class PlaybackService : MediaSessionService(), Player.Listener, AudioManager.OnA
 
                     // 🔊 Loudness enhancer — push overall presence
                     loudnessEnhancer = LoudnessEnhancer(sessionId).apply {
-                        setTargetGain(1800) // +18 dB — strong, but check for clipping
+                        setTargetGain(1000) // +18 dB — strong, but check for clipping
                         enabled = true
                     }
 

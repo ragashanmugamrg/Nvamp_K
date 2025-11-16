@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.amp.nvamp.MainActivity.Companion.medcontroller
 import com.amp.nvamp.MainActivity.Companion.playerViewModel
 import com.amp.nvamp.adapter.Playlistadapter
 import com.amp.nvamp.data.Song
@@ -21,22 +20,21 @@ class PlaylistFragment : Fragment() {
     var folderListView: RecyclerView? = null
 
 
-
-    companion object{
+    companion object {
         private val deviceMusicList: MutableMap<String, List<Song>> = mutableMapOf()
         private lateinit var adapter: Playlistadapter
-        fun playernotify(){
+        fun playernotify() {
             playernotifyadapter()
         }
 
-        private fun playernotifyadapter(){
+        private fun playernotifyadapter() {
             val deviceMusicByPlaylist = playerViewModel.getplayListMusic()
-            if (deviceMusicByPlaylist.isNotEmpty()){
+            if (deviceMusicByPlaylist.isNotEmpty()) {
                 deviceMusicList.clear()
                 deviceMusicList.put("Recently Added", deviceMusicByDate)
                 deviceMusicList.putAll(deviceMusicByPlaylist)
                 deviceMusicList.putAll(deviceMusicByPlaylist)
-                adapter.notifyItemRangeChanged(1,10)
+                adapter.notifyItemRangeChanged(1, 10)
             }
         }
     }
@@ -56,7 +54,7 @@ class PlaylistFragment : Fragment() {
         folderListView = playlistbinding.playlistsongrecyclerview
         val layoutManager = LinearLayoutManager(requireContext())
         folderListView?.layoutManager = layoutManager
-        adapter = Playlistadapter(deviceMusicList, medcontroller)
+        adapter = Playlistadapter(deviceMusicList, playerViewModel.controllerFuture)
         folderListView?.adapter = adapter
 
         return playlistbinding.root

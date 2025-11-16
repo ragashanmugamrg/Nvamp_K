@@ -7,11 +7,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.amp.nvamp.MainActivity.Companion.medcontroller
+import com.amp.nvamp.MainActivity.Companion.playerViewModel
 import com.amp.nvamp.adapter.Generlistadapter
 import com.amp.nvamp.data.Song
 import com.amp.nvamp.databinding.FragmentGenerBinding
-import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByFolder
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByGener
 
 
@@ -20,18 +19,18 @@ class GenerFragment : Fragment() {
     private lateinit var generbinding: FragmentGenerBinding
     var generListView: RecyclerView? = null
 
-    companion object{
+    companion object {
         private val deviceMusicList: MutableMap<String, List<Song>> = mutableMapOf()
         private lateinit var adapter: Generlistadapter
-        fun playernotify(){
+        fun playernotify() {
             playernotifyadapter()
         }
 
-        private fun playernotifyadapter(){
-            if (deviceMusicByGener.isNotEmpty()){
+        private fun playernotifyadapter() {
+            if (deviceMusicByGener.isNotEmpty()) {
                 deviceMusicList.clear()
                 deviceMusicList.putAll(deviceMusicByGener)
-                adapter.notifyItemRangeChanged(1,10)
+                adapter.notifyItemRangeChanged(1, 10)
             }
         }
     }
@@ -45,7 +44,7 @@ class GenerFragment : Fragment() {
         generListView = generbinding.foldersongrecyclerview
         val layoutManager = LinearLayoutManager(requireContext())
         generListView?.layoutManager = layoutManager
-        adapter = Generlistadapter(deviceMusicList, medcontroller)
+        adapter = Generlistadapter(deviceMusicList, playerViewModel.controllerFuture)
         generListView?.adapter = adapter
 
         return generbinding.root

@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.amp.nvamp.MainActivity.Companion.medcontroller
+import com.amp.nvamp.MainActivity.Companion.playerViewModel
 import com.amp.nvamp.adapter.Albumlistadapter
 import com.amp.nvamp.data.Song
 import com.amp.nvamp.databinding.FragmentMusicLibraryBinding
@@ -16,21 +16,21 @@ import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByAlbum
 class
 MusicLibrary : Fragment() {
 
-    companion object{
+    companion object {
         var libraryListView: RecyclerView? = null
         private lateinit var adapter: Albumlistadapter
 
         private val deviceMusicList: MutableMap<String, List<Song>> = mutableMapOf()
 
-        fun playernotify(){
+        fun playernotify() {
             playernotifyadapter()
         }
 
-        private fun playernotifyadapter(){
-            if (deviceMusicByAlbum.isNotEmpty()){
+        private fun playernotifyadapter() {
+            if (deviceMusicByAlbum.isNotEmpty()) {
                 deviceMusicList.clear()
                 deviceMusicList.putAll(deviceMusicByAlbum)
-                adapter.notifyItemRangeChanged(1,10)
+                adapter.notifyItemRangeChanged(1, 10)
             }
         }
     }
@@ -46,9 +46,9 @@ MusicLibrary : Fragment() {
         homebinding = FragmentMusicLibraryBinding.inflate(inflater)
 
         libraryListView = homebinding?.recyclerviewalbum
-        val layoutManager = GridLayoutManager(requireContext(),2)
+        val layoutManager = GridLayoutManager(requireContext(), 2)
         libraryListView?.layoutManager = layoutManager
-        adapter = Albumlistadapter(deviceMusicList, medcontroller)
+        adapter = Albumlistadapter(deviceMusicList, playerViewModel.controllerFuture)
         libraryListView?.adapter = adapter
 
         return homebinding?.root

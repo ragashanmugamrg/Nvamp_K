@@ -1,7 +1,6 @@
 package com.amp.nvamp.bottombar
 
 
-import android.content.ComponentName
 import android.content.Context
 import android.content.DialogInterface
 import android.net.Uri
@@ -18,17 +17,14 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.PlayerMessage
 import androidx.media3.session.MediaController
-import androidx.media3.session.SessionToken
 import com.amp.nvamp.MainActivity
-import com.amp.nvamp.MainActivity.Companion.playerViewModel
 import com.amp.nvamp.MainActivity.Companion.ahandler
+import com.amp.nvamp.MainActivity.Companion.playerViewModel
 import com.amp.nvamp.NvampApplication
 import com.amp.nvamp.R
 import com.amp.nvamp.data.Song
 import com.amp.nvamp.fragments.PlaylistFragment
-import com.amp.nvamp.playback.PlaybackService
 import com.amp.nvamp.utils.NvampUtils
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.mediaitems
 import com.bumptech.glide.Glide
@@ -85,6 +81,8 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
 
     val playlistmap = mutableMapOf<String,List<Song>>()
     val dynamicChoice: Set<String> = playlistmap.keys
+
+    private var isPlayerListenerAdded = false
 
     init {
         inflate(context, R.layout.player_bottom_sheet, this)
@@ -148,9 +146,8 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
         override fun run() {
             if (controller.isPlaying) {
                 slider.value = controller.currentPosition.toFloat()
-                playerViewModel.setLastPlayedms((slider.value).toLong())
             }
-            ahandler.postDelayed(this, 500)
+            ahandler.postDelayed(this, 100)
         }
     }
 
@@ -162,7 +159,6 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
         override fun onStopTrackingTouch(slider: Slider) {
             if (controller.currentMediaItem != null) {
                 controller.seekTo(((slider.value).toLong()))
-                playerViewModel.setLastPlayedms((slider.value).toLong())
             }
         }
     }
@@ -172,44 +168,62 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
 
         bottomSheet = PlayerBottomSheetBehaviour.from(this)
 
-        mediaController = MediaController.Builder(
-            NvampApplication.context,
-            SessionToken(
-                NvampApplication.context,
-                ComponentName(NvampApplication.context, PlaybackService::class.java)
-            ),
-        ).buildAsync()
+//        mediaController = MediaController.Builder(
+//            NvampApplication.context,
+//            SessionToken(
+//                NvampApplication.context,
+//                ComponentName(NvampApplication.context, PlaybackService::class.java)
+//            ),
+//        ).buildAsync()
 
+        mediaController = playerViewModel.controllerFuture
 
         mediaController.addListener(
             {
                 if (mediaController.isDone) {
                     controller = mediaController.get()
-                    controller.setMediaItems(mediaitems, playerViewModel.getlastplayedpos(),playerViewModel.getLastPlayedms())
-                    controller.addListener(object : Player.Listener {
-                        override fun onIsPlayingChanged(isPlaying: Boolean) {
-                            super.onIsPlayingChanged(isPlaying)
-                            onPlaybackStateChanged(controller.playbackState)
-                            ahandler.postDelayed(seekbarplayer, 500)
-                        }
 
-                        override fun onPlaybackStateChanged(playbackState: Int) {
-                            super.onPlaybackStateChanged(playbackState)
-                            updateplaying()
-                        }
+                    //controller.setMediaItems(mediaitems, playerViewModel.getlastplayedpos(),playerViewModel.getLastPlayedms().toLong())
 
-                        override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
-                            super.onMediaMetadataChanged(mediaMetadata)
-                            updatemetadata(mediaMetadata)
-                        }
 
-                        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-                            super.onMediaItemTransition(mediaItem, reason)
-                            slider.value = 0f
-                            ahandler.postDelayed(seekbarplayer, 500)
-                        }
+                    val lastIndex = playerViewModel.getlastplayedpos()
+                    val lastMs = playerViewModel.getLastPlayedms()
 
-                    })
+                    controller.setMediaItems(mediaitems)
+                    controller.prepare()
+                    controller.seekTo(lastIndex, lastMs.toLong())
+
+                    if(!isPlayerListenerAdded) {
+
+                        isPlayerListenerAdded = true
+
+                        controller.addListener(object : Player.Listener {
+                            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                                super.onIsPlayingChanged(isPlaying)
+                                onPlaybackStateChanged(controller.playbackState)
+                                if(isPlaying)
+                                    ahandler.post(seekbarplayer)
+                            }
+
+                            override fun onPlaybackStateChanged(playbackState: Int) {
+                                super.onPlaybackStateChanged(playbackState)
+                                updateplaying()
+                            }
+
+                            override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
+                                super.onMediaMetadataChanged(mediaMetadata)
+                                slider.value = playerViewModel.getLastPlayedms() ?: 0f
+                                updatemetadata(mediaMetadata)
+                            }
+
+                            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                                super.onMediaItemTransition(mediaItem, reason)
+                                slider.valueFrom = 0f
+                                ahandler.postDelayed(seekbarplayer, 500)
+                            }
+
+                        })
+                    }
                 }
             }, MoreExecutors.directExecutor()
         )
@@ -302,7 +316,6 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
 
         slider.addOnChangeListener(Slider.OnChangeListener { slider, value, fromUser ->
             leftduration.text = NvampUtils().formatDuration(value.toLong())
-            playerViewModel.setLastPlayedms(value.toLong())
         })
 
         appBar.setNavigationOnClickListener {

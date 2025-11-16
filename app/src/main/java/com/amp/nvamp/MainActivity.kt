@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.Player
 import androidx.media3.session.MediaBrowser
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
@@ -52,13 +53,10 @@ class MainActivity : AppCompatActivity() {
         get() = if (browserFuture.isDone && !browserFuture.isCancelled) browserFuture.get() else null
 
     companion object {
-        lateinit var medcontroller: ListenableFuture<MediaController>
         lateinit var customFragmentManager: FragmentManager
         val ahandler: Handler = Handler(Looper.getMainLooper())
         lateinit var playerViewModel: PlayerViewModel
     }
-
-    private lateinit var controller: MediaController
 
 
     @SuppressLint("ResourceType", "MissingInflatedId")
@@ -71,13 +69,12 @@ class MainActivity : AppCompatActivity() {
 
         playerViewModel = ViewModelProvider(this)[PlayerViewModel::class.java]
 
-        medcontroller = MediaController.Builder(
-            this,
-            SessionToken(this, ComponentName(this, PlaybackService::class.java)),
-        ).buildAsync()
+        playerViewModel.controllerFuture.addListener({
+            val controller = playerViewModel.controller
+            prepareController(controller)
+        }, MoreExecutors.directExecutor())
 
         lifecycleScope.launch {
-
             PlayerViewModel(application).initialized()
             HomeFragment.playernotify()
             MusicLibrary.playernotify()
@@ -90,16 +87,30 @@ class MainActivity : AppCompatActivity() {
 
         customFragmentManager = supportFragmentManager
 
-        medcontroller.addListener(
-            {
-                if (medcontroller.isDone) {
-                    controller = medcontroller.get()
-                    playerViewModel.getlastplayedpos()
-                    controller.setMediaItems(mediaitems, playerViewModel.getlastplayedpos(),
-                        playerViewModel.getLastPlayedms())
+
+    }
+
+    private fun prepareController(controller: MediaController) {
+
+        if (controller.isConnected) {
+
+            val lastIndex = playerViewModel.getlastplayedpos()
+            val lastMs = playerViewModel.getLastPlayedms()
+
+            controller.setMediaItems(mediaitems)
+            controller.prepare()
+            controller.seekTo(lastIndex, lastMs.toLong())
+
+            controller.addListener(object : Player.Listener{
+                override fun onEvents(player: Player, events: Player.Events) {
+                    super.onEvents(player, events)
+
+                    playerViewModel.setlastplayedpos(player.currentMediaItemIndex)
+
+                    playerViewModel.setLastPlayedms(player.currentPosition.toFloat())
                 }
-            }, MoreExecutors.directExecutor()
-        )
+            })
+        }
     }
 
 
@@ -125,20 +136,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
-    override fun onPause() {
-        super.onPause()
-        medcontroller.cancel(true)
-    }
-
-
-    override fun onResume() {
-        super.onResume()
-        medcontroller = MediaController.Builder(
-            this,
-            SessionToken(this, ComponentName(this, PlaybackService::class.java)),
-        ).buildAsync()
-    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<out String>, grantResults: IntArray

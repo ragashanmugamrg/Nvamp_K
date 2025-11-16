@@ -8,11 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.media3.common.MediaItem
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.amp.nvamp.MainActivity.Companion.medcontroller
 import com.amp.nvamp.MainActivity.Companion.playerViewModel
 import com.amp.nvamp.adapter.Songslistadapter
 import com.amp.nvamp.databinding.FragmentHomeBinding
-import com.amp.nvamp.fragments.ViewPagerFragment.Companion.loaderview
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.mediaitems
 
 class HomeFragment : Fragment() {
@@ -46,7 +44,7 @@ class HomeFragment : Fragment() {
         libraryListView = homebinding?.recyclerview
         val layoutManager = LinearLayoutManager(requireContext())
         libraryListView?.layoutManager = layoutManager
-        adapter = Songslistadapter(musicList, medcontroller)
+        adapter = Songslistadapter(musicList, playerViewModel.controllerFuture)
         libraryListView?.adapter = adapter
         //playerViewModel.setlastplayedmedia(playerViewModel.songs)
         return homebinding?.root
