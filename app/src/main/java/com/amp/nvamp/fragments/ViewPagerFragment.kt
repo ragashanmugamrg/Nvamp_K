@@ -14,10 +14,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.amp.nvamp.MainActivity
+import com.amp.nvamp.NvampApplication
 import com.amp.nvamp.R
 import com.amp.nvamp.adapter.Songslistadapter
 import com.amp.nvamp.data.Song
 import com.amp.nvamp.settings.NvampPlayerSettings
+import com.amp.nvamp.utils.NvampUtils
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.songs
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.card.MaterialCardView
@@ -133,12 +135,7 @@ class ViewPagerFragment : Fragment() {
                     lifecycleScope.launch {
                         loaderview.visibility = VISIBLE
                         MainActivity.playerViewModel.refreshdatainpref()
-                        HomeFragment.playernotify()
-                        MusicLibrary.playernotify()
-                        FolderFragment.playernotify()
-                        ArtistFragment.playernotify()
-                        GenerFragment.playernotify()
-                        PlaylistFragment.playernotify()
+                        NvampUtils().RefreshMusicLibrary(NvampApplication.instance)
                         loaderview.visibility = GONE
 
                         Snackbar.make(

@@ -10,6 +10,8 @@ class NvampApplication : Application() {
         super.onCreate()
         context = applicationContext
 
+        instance = this
+
         val prefs = getSharedPreferences("PlayerPreferences", MODE_PRIVATE)
         val mode = prefs.getInt("theme_mode", ThemeManager.MODE_SYSTEM)
         ThemeManager.applyTheme(mode)
@@ -18,5 +20,8 @@ class NvampApplication : Application() {
     companion object {
         @SuppressLint("StaticFieldLeak")
         lateinit var context: Context
+
+        @SuppressLint("StaticFieldLeak")
+        lateinit var instance: NvampApplication
     }
 }

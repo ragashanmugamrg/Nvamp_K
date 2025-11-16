@@ -1,5 +1,6 @@
 package com.amp.nvamp.utils
 
+import android.app.Application
 import androidx.annotation.OptIn
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
@@ -7,6 +8,12 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
 import com.amp.nvamp.data.Song
+import com.amp.nvamp.fragments.ArtistFragment
+import com.amp.nvamp.fragments.FolderFragment
+import com.amp.nvamp.fragments.GenerFragment
+import com.amp.nvamp.fragments.HomeFragment
+import com.amp.nvamp.fragments.MusicLibrary
+import com.amp.nvamp.viewmodel.PlayerViewModel
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -19,6 +26,17 @@ class NvampUtils {
         )
         return String.format("%02d:%02d", minutes, seconds)
     }
+
+
+    suspend fun RefreshMusicLibrary(application: Application) {
+        PlayerViewModel(application).initialized()
+        HomeFragment.playernotify()
+        MusicLibrary.playernotify()
+        FolderFragment.playernotify()
+        ArtistFragment.playernotify()
+        GenerFragment.playernotify()
+    }
+
 
     @OptIn(UnstableApi::class)
     fun changeSongmodeltoMediaitem(data: Song): MediaItem.Builder {

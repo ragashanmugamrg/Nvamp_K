@@ -17,6 +17,7 @@ import com.amp.nvamp.MainActivity.Companion.playerViewModel
 import com.amp.nvamp.adapter.Songslistadapter
 import com.amp.nvamp.data.Song
 import com.amp.nvamp.databinding.FragmentAlbumSongListBinding
+import com.amp.nvamp.utils.NvampUtils
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByAlbum
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByArtist
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByDate
@@ -100,20 +101,8 @@ class AlbumSongList : Fragment() {
         // playerViewModel.setlastplayedmedia(listofsongs!!.toMutableList())
         if (listofsongs!!.isNotEmpty()) {
             listofsongs.forEach { data ->
-                val mediaItem =
-                    MediaItem.Builder().setMediaId(data.data)
-                        .setUri((data.data.let { it -> File(it) }).toUri())
-                        .setMediaId("MediaStore:$data.id")
-                        .setMediaMetadata(
-                            MediaMetadata.Builder()
-                                .setTitle(data.title)
-                                .setArtist(data.artist)
-                                .setDurationMs(data.duration)
-                                .setArtworkUri(data.imgUri)
-                                .setDescription(data.data)
-                                .build(),
-                        )
-                mediasongs.add(mediaItem.build())
+                val mediaItem = NvampUtils().changeSongmodeltoMediaitem(data).build()
+                mediasongs.add(mediaItem)
             }
         }
 
