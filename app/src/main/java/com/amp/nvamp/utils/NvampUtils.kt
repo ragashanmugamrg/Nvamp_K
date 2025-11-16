@@ -34,7 +34,7 @@ class NvampUtils {
                     .setDescription(data.data)
                     .setExtras(
                         bundleOf(
-                            "ALBUM_ID" to data.album_id       // <-- Add this
+                            "ALBUM_ID" to data.album_id
                         )
                     )
                     .build()

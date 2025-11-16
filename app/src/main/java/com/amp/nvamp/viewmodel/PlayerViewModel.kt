@@ -204,6 +204,14 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
 
 
+    fun putlastPlayedMediaItem(media: List<Song>){
+        StoragePrefrence().putLastPlayedMedia(media)
+    }
+
+    fun getlastPlayedMediaItem(): List<Song>{
+        return StoragePrefrence().getLastPlayedMedia()
+    }
+
     fun setlastplayedpos(value: Int) {
         StoragePrefrence().putLastplayedpos(value)
     }

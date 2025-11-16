@@ -185,13 +185,12 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
 
                     //controller.setMediaItems(mediaitems, playerViewModel.getlastplayedpos(),playerViewModel.getLastPlayedms().toLong())
 
+//                    val lastIndex = playerViewModel.getlastplayedpos()
+//                    val lastMs = playerViewModel.getLastPlayedms()
 
-                    val lastIndex = playerViewModel.getlastplayedpos()
-                    val lastMs = playerViewModel.getLastPlayedms()
-
-                    controller.setMediaItems(mediaitems)
-                    controller.prepare()
-                    controller.seekTo(lastIndex, lastMs.toLong())
+//                    controller.setMediaItems(mediaitems)
+//                    controller.prepare()
+//                    controller.seekTo(lastIndex, lastMs.toLong())
 
                     if(!isPlayerListenerAdded) {
 

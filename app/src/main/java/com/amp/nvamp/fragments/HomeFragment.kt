@@ -46,7 +46,7 @@ class HomeFragment : Fragment() {
         libraryListView?.layoutManager = layoutManager
         adapter = Songslistadapter(musicList, playerViewModel.controllerFuture)
         libraryListView?.adapter = adapter
-        //playerViewModel.setlastplayedmedia(playerViewModel.songs)
+
         return homebinding?.root
     }
 

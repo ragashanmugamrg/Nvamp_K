@@ -7,6 +7,9 @@ import android.view.ViewGroup
 import androidx.annotation.OptIn
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
@@ -21,6 +24,7 @@ import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByArtist
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByDate
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByFolder
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByGener
+import kotlinx.coroutines.launch
 import java.io.File
 
 
@@ -73,7 +77,14 @@ class AlbumSongList : Fragment() {
         }
 
 
+        //LastPlayed Media Store
+        lifecycleScope.launch {
+            playerViewModel.putlastPlayedMediaItem(listofsongs!!)
+        }
+
         var listofAlbumsongs = changeSongmodeltoMediaitem(listofsongs)
+
+
 
         libraryListView = albumsonglistbinding?.albumsongrecyclerview
 

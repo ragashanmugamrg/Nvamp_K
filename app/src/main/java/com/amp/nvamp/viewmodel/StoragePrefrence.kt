@@ -29,7 +29,7 @@ class StoragePrefrence {
             .add(UriParser())
             .build()
 
-        types = Types.newParameterizedType(MutableList::class.java,MediaItem::class.java)
+        types = Types.newParameterizedType(MutableList::class.java,Song::class.java)
     }
 
 
@@ -85,11 +85,24 @@ class StoragePrefrence {
     }
 
 
-    fun putLastPlayedMedia(media: MutableList<MediaItem>?,value: Int, position: Long ) {
+    fun putLastPlayedMedia(media: List<Song>?) {
         val jsonAdapter =
-            types?.let { moshi?.adapter<List<MediaItem>>(it) }
+            types?.let { moshi?.adapter<List<Song>>(it) }
         val json = jsonAdapter?.toJson(media)
         sp!!.edit().putString("LastMediaItems", json).apply()
+    }
+
+    fun getLastPlayedMedia():List<Song>{
+        val json = sp!!.getString("LastMediaItems", null)
+        if (json != null) {
+            try {
+                val jsonAdapter = types?.let { moshi?.adapter<List<Song>>(it) }
+                return (jsonAdapter?.fromJson(json) ?: mutableListOf())
+            } catch (e: IOException) {
+                throw RuntimeException(e)
+            }
+        }
+        return mutableListOf()
     }
 
 

@@ -18,10 +18,12 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.session.MediaBrowser
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
+import com.amp.nvamp.data.Song
 import com.amp.nvamp.databinding.ActivityMainBinding
 import com.amp.nvamp.fragments.ArtistFragment
 import com.amp.nvamp.fragments.FolderFragment
@@ -49,6 +51,7 @@ class MainActivity : AppCompatActivity() {
     var binding: ActivityMainBinding? = null
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private lateinit var browserFuture: ListenableFuture<MediaBrowser>
+    private var isRestored = false
     private val browser: MediaBrowser?
         get() = if (browserFuture.isDone && !browserFuture.isCancelled) browserFuture.get() else null
 
@@ -94,23 +97,48 @@ class MainActivity : AppCompatActivity() {
 
         if (controller.isConnected) {
 
-            val lastIndex = playerViewModel.getlastplayedpos()
-            val lastMs = playerViewModel.getLastPlayedms()
+            val songmediaItems = playerViewModel.getlastPlayedMediaItem().map { data ->
+                NvampUtils().changeSongmodeltoMediaitem(data).build()
+            }.toMutableList()
 
-            controller.setMediaItems(mediaitems)
-            controller.prepare()
-            controller.seekTo(lastIndex, lastMs.toLong())
 
-            controller.addListener(object : Player.Listener{
+
+
+
+
+            controller.addListener(object : Player.Listener {
+
+                override fun onPlaybackStateChanged(state: Int) {
+
+                    if (!isRestored && state == Player.STATE_READY) {
+
+                        val lastIndex = playerViewModel.getlastplayedpos()
+                        val lastMs = playerViewModel.getLastPlayedms().toLong()
+
+                        controller.seekTo(lastIndex, lastMs)
+
+                        isRestored = true
+                    }
+                }
+
                 override fun onEvents(player: Player, events: Player.Events) {
                     super.onEvents(player, events)
 
-                    playerViewModel.setlastplayedpos(player.currentMediaItemIndex)
-
-                    playerViewModel.setLastPlayedms(player.currentPosition.toFloat())
+                    if (isRestored) {
+                        playerViewModel.setlastplayedpos(player.currentMediaItemIndex)
+                        playerViewModel.setLastPlayedms(player.currentPosition.toFloat())
+                    }
                 }
             })
+
+
+            controller.setMediaItems(
+                songmediaItems.ifEmpty { mediaitems }
+            )
+            controller.prepare()
         }
+
+
     }
 
 
