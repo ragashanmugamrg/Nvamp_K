@@ -23,10 +23,8 @@ import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import com.amp.nvamp.MainActivity
 import com.amp.nvamp.MainActivity.Companion.playerViewModel
-import com.amp.nvamp.viewmodel.PlayerViewModel
 
 class PlaybackService : MediaSessionService(), Player.Listener, AudioManager.OnAudioFocusChangeListener {
-
     private var mediaSession: MediaSession? = null
     private var equalizer: Equalizer? = null
     private var loudnessEnhancer: LoudnessEnhancer? = null
@@ -44,100 +42,113 @@ class PlaybackService : MediaSessionService(), Player.Listener, AudioManager.OnA
     override fun onCreate() {
         super.onCreate()
 
-        val loadControl = DefaultLoadControl.Builder()
-            .setBufferDurationsMs(25000, 50000, 1000, 2000)
-            .build()
+        val loadControl =
+            DefaultLoadControl.Builder()
+                .setBufferDurationsMs(25000, 50000, 1000, 2000)
+                .build()
 
-        val audioAttributes = AudioAttributes.Builder()
-            .setUsage(C.USAGE_MEDIA)
-            .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
-            .build()
+        val audioAttributes =
+            AudioAttributes.Builder()
+                .setUsage(C.USAGE_MEDIA)
+                .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
+                .build()
 
-        player = ExoPlayer.Builder(this)
-            .setLoadControl(loadControl)
-            .setAudioAttributes(audioAttributes, true)
-            .build()
+        player =
+            ExoPlayer.Builder(this)
+                .setLoadControl(loadControl)
+                .setAudioAttributes(audioAttributes, true)
+                .build()
 
         player.addListener(this)
         player.setWakeMode(C.WAKE_MODE_LOCAL)
 
-
         val sessionIntent = Intent(this.applicationContext, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(this, 0, sessionIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+        val pendingIntent =
+            PendingIntent.getActivity(
+                this,
+                0,
+                sessionIntent,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+            )
 
-        mediaSession = MediaSession.Builder(this, player)
-            .setSessionActivity(pendingIntent)
-            .build()
-
+        mediaSession =
+            MediaSession.Builder(this, player)
+                .setSessionActivity(pendingIntent)
+                .build()
 
         setupAudioEffectsSafely()
     }
 
     @OptIn(UnstableApi::class)
     private fun setupAudioEffectsSafely() {
-        player.addListener(object : Player.Listener {
-            override fun onAudioSessionIdChanged(audioSessionId: Int) {
-                sessionId = audioSessionId
-                Log.d("PlaybackService", "AudioSessionId ready: $sessionId")
+        player.addListener(
+            object : Player.Listener {
+                override fun onAudioSessionIdChanged(audioSessionId: Int) {
+                    sessionId = audioSessionId
+                    Log.d("PlaybackService", "AudioSessionId ready: $sessionId")
 
-                // Clean up any existing effects to prevent leaks or conflicts
-                releaseAudioEffects()
+                    // Clean up any existing effects to prevent leaks or conflicts
+                    releaseAudioEffects()
 
-                try {
-                    // 🎚️ Equalizer — tuned for headphone clarity
-                    equalizer = Equalizer(0, sessionId).apply {
-                        enabled = true
-                        val bandRange = bandLevelRange
-                        val minLevel = bandRange[0]
-                        val maxLevel = bandRange[1]
-                        val numBands = numberOfBands
+                    try {
+                        // 🎚️ Equalizer — tuned for headphone clarity
+                        equalizer =
+                            Equalizer(0, sessionId).apply {
+                                enabled = true
+                                val bandRange = bandLevelRange
+                                val minLevel = bandRange[0]
+                                val maxLevel = bandRange[1]
+                                val numBands = numberOfBands
 
-                        for (i in 0 until numBands) {
-                            val centerFreq = getCenterFreq(i.toShort()) / 1000 // Hz
-                            val level: Short = when {
-                                centerFreq < 120 -> (maxLevel * 0.7f).toInt().toShort()   // Deep bass boost
-                                centerFreq in 120..400 -> (maxLevel * 0.3f).toInt().toShort() // Warmth
-                                centerFreq in 400..1000 -> (minLevel * 0.2f).toInt().toShort() // Clean mids
-                                centerFreq in 1000..4000 -> (maxLevel * 0.4f).toInt().toShort() // Vocal clarity
-                                else -> (maxLevel * 0.6f).toInt().toShort()           // Sparkle highs
+                                for (i in 0 until numBands) {
+                                    val centerFreq = getCenterFreq(i.toShort()) / 1000 // Hz
+                                    val level: Short =
+                                        when {
+                                            centerFreq < 120 -> (maxLevel * 0.7f).toInt().toShort() // Deep bass boost
+                                            centerFreq in 120..400 -> (maxLevel * 0.3f).toInt().toShort() // Warmth
+                                            centerFreq in 400..1000 -> (minLevel * 0.2f).toInt().toShort() // Clean mids
+                                            centerFreq in 1000..4000 -> (maxLevel * 0.4f).toInt().toShort() // Vocal clarity
+                                            else -> (maxLevel * 0.6f).toInt().toShort() // Sparkle highs
+                                        }
+                                    setBandLevel(i.toShort(), level)
+                                }
                             }
-                            setBandLevel(i.toShort(), level)
+
+                        // 🔊 Loudness enhancer — push overall presence
+                        loudnessEnhancer =
+                            LoudnessEnhancer(sessionId).apply {
+                                setTargetGain(1000) // +18 dB — strong, but check for clipping
+                                enabled = true
+                            }
+
+                        // 🧠 DynamicsProcessing — compression + bass/treble enhancement
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            val config =
+                                DynamicsProcessing.Config.Builder(
+                                    DynamicsProcessing.VARIANT_FAVOR_FREQUENCY_RESOLUTION,
+                                    1, // channels
+                                    true, 1, true, 1, true, 1, true,
+                                ).build()
+
+                            val channel = dynamicsProcessing?.getChannelByChannelIndex(0)
+                            channel?.getPreEqBand(0)?.gain = 3.0f
+                            channel?.getPostEqBand(config.postEqBandCount - 1)?.gain = 2.0f
+
+                            // configure limiter
+                            channel?.limiter?.apply {
+                                attackTime = 20f
+                                releaseTime = 300f
+                                ratio = 2.5f
+                                threshold = -10f
+                            }
+                            Log.d("PlaybackService", "DynamicsProcessing applied for headphones")
                         }
+                    } catch (e: Exception) {
+                        Log.e("PlaybackService", "AudioEffect error: ${e.stackTraceToString()}")
                     }
-
-                    // 🔊 Loudness enhancer — push overall presence
-                    loudnessEnhancer = LoudnessEnhancer(sessionId).apply {
-                        setTargetGain(1000) // +18 dB — strong, but check for clipping
-                        enabled = true
-                    }
-
-                    // 🧠 DynamicsProcessing — compression + bass/treble enhancement
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        val config = DynamicsProcessing.Config.Builder(
-                            DynamicsProcessing.VARIANT_FAVOR_FREQUENCY_RESOLUTION,
-                            1,  // channels
-                            true, 1, true, 1,true,1,true
-                        ).build()
-
-                        val channel = dynamicsProcessing?.getChannelByChannelIndex(0)
-                        channel?.getPreEqBand(0)?.gain = 3.0f
-                        channel?.getPostEqBand(config.postEqBandCount - 1)?.gain = 2.0f
-
-                        // configure limiter
-                        channel?.limiter?.apply {
-                            attackTime = 20f
-                            releaseTime = 300f
-                            ratio = 2.5f
-                            threshold = -10f
-                        }
-                        Log.d("PlaybackService", "DynamicsProcessing applied for headphones")
-                    }
-
-                } catch (e: Exception) {
-                    Log.e("PlaybackService", "AudioEffect error: ${e.stackTraceToString()}")
                 }
-            }
-        })
+            },
+        )
     }
 
     /**
@@ -159,12 +170,12 @@ class PlaybackService : MediaSessionService(), Player.Listener, AudioManager.OnA
         }
     }
 
-
     override fun onDestroy() {
         try {
             equalizer?.release()
             loudnessEnhancer?.release()
-        } catch (_: Exception) {}
+        } catch (_: Exception) {
+        }
 
         mediaSession?.run {
             player.release()
@@ -180,7 +191,10 @@ class PlaybackService : MediaSessionService(), Player.Listener, AudioManager.OnA
         val lastplay = playerViewModel.getlastplayedpos()
     }
 
-    override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+    override fun onMediaItemTransition(
+        mediaItem: MediaItem?,
+        reason: Int,
+    ) {
         super.onMediaItemTransition(mediaItem, reason)
         if (!hasInitializedPlayback) {
             hasInitializedPlayback = true
@@ -190,22 +204,23 @@ class PlaybackService : MediaSessionService(), Player.Listener, AudioManager.OnA
 
     fun successfullyRetrievedAudioFocus(): Boolean {
         val audioManager: AudioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        val audioAttributes = android.media.AudioAttributes.Builder()
-            .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
-            .setContentType(android.media.AudioAttributes.CONTENT_TYPE_MUSIC)
-            .build()
+        val audioAttributes =
+            android.media.AudioAttributes.Builder()
+                .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
+                .setContentType(android.media.AudioAttributes.CONTENT_TYPE_MUSIC)
+                .build()
 
-        val audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-            .setAudioAttributes(audioAttributes)
-            .setOnAudioFocusChangeListener(this)
-            .build()
+        val audioFocusRequest =
+            AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                .setAudioAttributes(audioAttributes)
+                .setOnAudioFocusChangeListener(this)
+                .build()
 
         val result = audioManager.requestAudioFocus(audioFocusRequest)
         return result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
     }
 
-    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? =
-        mediaSession
+    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? = mediaSession
 
     override fun onAudioFocusChange(focusChange: Int) {
         when (focusChange) {

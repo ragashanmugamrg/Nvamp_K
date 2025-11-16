@@ -19,10 +19,8 @@ data class Song(
     @Json(name = "id") val id: String,
     @Json(name = "date") val date: Int?,
     @Json(name = "count") val count: Int?,
-    @Json(name = "lastmodifiydate") val lastmodifiydate: Long?
+    @Json(name = "lastmodifiydate") val lastmodifiydate: Long?,
 )
-
-
 
 fun SongEntity.toSongs(): Song {
     return Song(
@@ -39,24 +37,23 @@ fun SongEntity.toSongs(): Song {
         gener = this.gener ?: "",
         date = this.date ?: 0,
         count = this.count ?: 0,
-        lastmodifiydate = this.last_modifiy_dt ?: 0L
+        lastmodifiydate = this.last_modifiy_dt ?: 0L,
     )
 }
-
 
 data class Album(
     val title: String,
     val artist: String,
     val cover: Drawable?,
-    val songList: List<Song>
+    val songList: List<Song>,
 )
 
 data class Artist(
     val artist: String,
-    val songList: List<Song>
+    val songList: List<Song>,
 )
 
 data class Playlistdata(
     @Json val title: String,
-    @Json val songid: String?
+    @Json val songid: String?,
 )

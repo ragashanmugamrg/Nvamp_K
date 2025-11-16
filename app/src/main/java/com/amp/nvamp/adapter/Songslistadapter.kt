@@ -31,16 +31,12 @@ import java.io.File
 
 class Songslistadapter(
     private val mediaitems: MutableList<MediaItem>,
-    private val medcontroller: ListenableFuture<MediaController>
+    private val medcontroller: ListenableFuture<MediaController>,
 ) : RecyclerView.Adapter<Songslistadapter.MyViewHolder>() {
-
-
     var songqueue = mutableListOf<MediaItem>()
 
     val playlistmap = mutableMapOf<String, List<Song>>()
     val dynamicChoice: Set<String> = playlistmap.keys
-
-
 
     inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val songTitle: TextView = view.findViewById(R.id.title)
@@ -51,7 +47,10 @@ class Songslistadapter(
         val options: MaterialButton = view.findViewById(R.id.options)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): MyViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.songs_card_view, parent, false)
         return MyViewHolder(view)
@@ -59,17 +58,20 @@ class Songslistadapter(
 
     override fun getItemCount(): Int = mediaitems.size
 
-
     @OptIn(UnstableApi::class)
-    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: MyViewHolder,
+        position: Int,
+    ) {
         holder.songTitle.text = mediaitems[position].mediaMetadata.title
         holder.songartist.text = mediaitems[position].mediaMetadata.artist
 
-        holder.songDuration.text = mediaitems[position].mediaMetadata.durationMs?.let {
-            NvampUtils().formatDuration(
-                it
-            )
-        }
+        holder.songDuration.text =
+            mediaitems[position].mediaMetadata.durationMs?.let {
+                NvampUtils().formatDuration(
+                    it,
+                )
+            }
 
         Glide.with(holder.songalbumart.context)
             .load(mediaitems[position].mediaMetadata.artworkUri)
@@ -81,11 +83,6 @@ class Songslistadapter(
             showPopupMenu(v, position)
         }
 
-
-
-
-
-
         holder.itemView.setOnClickListener {
             songqueue.addAll(mediaitems)
 
@@ -96,13 +93,13 @@ class Songslistadapter(
                 controller.play()
                 playerViewModel.setlastplayedpos(position)
             }
-
-
         }
-
     }
 
-    fun showPopupMenu(view: View, position: Int) {
+    fun showPopupMenu(
+        view: View,
+        position: Int,
+    ) {
         val popupMenu = PopupMenu(view.context, view)
         val inflater: MenuInflater = popupMenu.menuInflater
         inflater.inflate(R.menu.song_menu, popupMenu.menu)
@@ -110,44 +107,47 @@ class Songslistadapter(
         popupMenu.show()
     }
 
-
     @OptIn(UnstableApi::class)
-    fun handleMenuClick(item: MenuItem, position: Int, view: View): Boolean {
+    fun handleMenuClick(
+        item: MenuItem,
+        position: Int,
+        view: View,
+    ): Boolean {
         var playlistnames = mutableListOf<String>()
         playlistmap.putAll(playerViewModel.getplayListMusic())
         dynamicChoice.forEach { name ->
             playlistnames.add(name)
         }
         return when (item.title) {
-
             "Play Next" -> {
                 if (songqueue.isNotEmpty()) {
-
 //                    val lastplayedpos = playerViewModel.getlastplayedpos()
-                    val mediaItem = MediaItem.Builder()
-                        .setMediaId(mediaitems[position].mediaMetadata.description.toString())
-                        .setUri(
-                            (mediaitems[position].mediaMetadata.description.toString()
-                                .let { it -> File(it) }).toUri()
-                        )
-                        .setMediaId("MediaStore:id")
-                        .setMediaMetadata(
-                            MediaMetadata.Builder()
-                                .setTitle(mediaitems[position].mediaMetadata.title.toString())
-                                .setArtist(mediaitems[position].mediaMetadata.artist.toString())
-                                .setDurationMs(mediaitems[position].mediaMetadata.durationMs)
-                                .setArtworkUri(mediaitems[position].mediaMetadata.artworkUri!!)
-                                .setDescription(mediaitems[position].mediaMetadata.description.toString())
-                                .build()
-                        ).build()
+                    val mediaItem =
+                        MediaItem.Builder()
+                            .setMediaId(mediaitems[position].mediaMetadata.description.toString())
+                            .setUri(
+                                (
+                                    mediaitems[position].mediaMetadata.description.toString()
+                                        .let { it -> File(it) }
+                                ).toUri(),
+                            )
+                            .setMediaId("MediaStore:id")
+                            .setMediaMetadata(
+                                MediaMetadata.Builder()
+                                    .setTitle(mediaitems[position].mediaMetadata.title.toString())
+                                    .setArtist(mediaitems[position].mediaMetadata.artist.toString())
+                                    .setDurationMs(mediaitems[position].mediaMetadata.durationMs)
+                                    .setArtworkUri(mediaitems[position].mediaMetadata.artworkUri!!)
+                                    .setDescription(mediaitems[position].mediaMetadata.description.toString())
+                                    .build(),
+                            ).build()
 //                    songqueue.add(lastplayedpos,mediaItem.build())
                     var controller = medcontroller.get()
                     controller.addMediaItem(
                         medcontroller.get().currentMediaItemIndex + 1,
-                        mediaItem
+                        mediaItem,
                     )
                     controller.prepare()
-
                 }
                 return true
             }
@@ -165,22 +165,23 @@ class Songslistadapter(
                             }
                             .setPositiveButton("ok") { dialog, which ->
                                 val playlistname = editText.text
-                                val playlist = Song(
-                                    mediaitems[position].mediaMetadata.title.toString(),
-                                    mediaitems[position].mediaMetadata.artist.toString(),
-                                    mediaitems[position].mediaMetadata.durationMs,
-                                    mediaitems[position].mediaMetadata.description.toString(),
-                                    "",
-                                    "",
-                                    0L,
-                                    mediaitems[position].mediaMetadata.artworkUri!!,
-                                    "",
-                                    "",
-                                    mediaitems[position].mediaMetadata.description.toString(),
-                                    0,
-                                    mediaitems[position].mediaMetadata.trackNumber,
-                                    0L
-                                )
+                                val playlist =
+                                    Song(
+                                        mediaitems[position].mediaMetadata.title.toString(),
+                                        mediaitems[position].mediaMetadata.artist.toString(),
+                                        mediaitems[position].mediaMetadata.durationMs,
+                                        mediaitems[position].mediaMetadata.description.toString(),
+                                        "",
+                                        "",
+                                        0L,
+                                        mediaitems[position].mediaMetadata.artworkUri!!,
+                                        "",
+                                        "",
+                                        mediaitems[position].mediaMetadata.description.toString(),
+                                        0,
+                                        mediaitems[position].mediaMetadata.trackNumber,
+                                        0L,
+                                    )
                                 var newplaylist = mutableListOf<Song>()
                                 newplaylist.add(playlist)
                                 playlistmap.put(playlistname.toString(), newplaylist)
@@ -197,26 +198,27 @@ class Songslistadapter(
                     })
                     .setMultiChoiceItems(
                         playlistnames.toTypedArray(),
-                        null
+                        null,
                     ) { dialog, which, ischecked ->
                         val selectedItem = playlistnames[which]
                         if (ischecked) {
-                            val playlist = Song(
-                                mediaitems[position].mediaMetadata.title.toString(),
-                                mediaitems[position].mediaMetadata.artist.toString(),
-                                mediaitems[position].mediaMetadata.durationMs,
-                                mediaitems[position].mediaMetadata.description.toString(),
-                                "",
-                                "",
-                                0L,
-                                mediaitems[position].mediaMetadata.artworkUri!!,
-                                "",
-                                "",
-                                mediaitems[position].mediaMetadata.description.toString(),
-                                0,
-                                mediaitems[position].mediaMetadata.trackNumber,
-                                0L
-                            )
+                            val playlist =
+                                Song(
+                                    mediaitems[position].mediaMetadata.title.toString(),
+                                    mediaitems[position].mediaMetadata.artist.toString(),
+                                    mediaitems[position].mediaMetadata.durationMs,
+                                    mediaitems[position].mediaMetadata.description.toString(),
+                                    "",
+                                    "",
+                                    0L,
+                                    mediaitems[position].mediaMetadata.artworkUri!!,
+                                    "",
+                                    "",
+                                    mediaitems[position].mediaMetadata.description.toString(),
+                                    0,
+                                    mediaitems[position].mediaMetadata.trackNumber,
+                                    0L,
+                                )
                             var newplaylist = mutableListOf<Song>()
                             val play = playlistmap.get(selectedItem)?.toMutableList()
                             if (play != null) {

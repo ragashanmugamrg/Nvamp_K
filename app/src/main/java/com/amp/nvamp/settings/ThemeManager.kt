@@ -3,7 +3,6 @@ package com.amp.nvamp.settings
 import androidx.appcompat.app.AppCompatDelegate
 
 object ThemeManager {
-
     fun applyTheme(mode: Int) {
         AppCompatDelegate.setDefaultNightMode(mode)
     }

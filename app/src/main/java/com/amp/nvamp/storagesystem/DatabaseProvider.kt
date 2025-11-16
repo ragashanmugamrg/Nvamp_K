@@ -12,7 +12,7 @@ object DatabaseProvider {
             INSTANCE ?: Room.databaseBuilder(
                 context.applicationContext,
                 AppDatabase::class.java,
-                "playerdb"
+                "playerdb",
             ).build().also { INSTANCE = it }
         }
 }

@@ -2,9 +2,7 @@ package com.amp.nvamp.viewmodel
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.media3.common.MediaItem
 import com.amp.nvamp.NvampApplication
-import com.amp.nvamp.data.Playlistdata
 import com.amp.nvamp.data.Song
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -13,40 +11,34 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.io.IOException
 import java.lang.reflect.ParameterizedType
 
-
 class StoragePrefrence {
-
-    var sp:SharedPreferences? = null
+    var sp: SharedPreferences? = null
     var moshi: Moshi? = null
 
-    var types:ParameterizedType? = null
-
+    var types: ParameterizedType? = null
 
     init {
         sp = NvampApplication.context.getSharedPreferences("PlayerPreferences", Context.MODE_PRIVATE)
-        moshi = Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .add(UriParser())
-            .build()
+        moshi =
+            Moshi.Builder()
+                .add(KotlinJsonAdapterFactory())
+                .add(UriParser())
+                .build()
 
-        types = Types.newParameterizedType(MutableList::class.java,Song::class.java)
+        types = Types.newParameterizedType(MutableList::class.java, Song::class.java)
     }
 
-
-    fun putLastPlayedms(value: Float){
-        sp?.edit()?.putFloat("LastPlayedms",value)?.apply()
+    fun putLastPlayedms(value: Float)  {
+        sp?.edit()?.putFloat("LastPlayedms", value)?.apply()
     }
 
-
-    fun getLastPlayedms() = sp?.getFloat("LastPlayedms",0f)
-
+    fun getLastPlayedms() = sp?.getFloat("LastPlayedms", 0f)
 
     fun saveMode(mode: Int) {
         sp?.edit()
             ?.putInt("theme_mode", mode)
             ?.apply()
     }
-
 
     fun putLastplayedpos(lastPlayedPosition: Int) {
         print(lastPlayedPosition)
@@ -64,16 +56,16 @@ class StoragePrefrence {
         sp!!.edit().putString("playlist", json).apply()
     }
 
-
     fun getplayListMusic(): Map<String, List<Song>> {
         val json = sp!!.getString("playlist", null)
         if (json != null) {
             try {
-                val type = Types.newParameterizedType(
-                    Map::class.java,
-                    String::class.java,
-                    Types.newParameterizedType(List::class.java, Song::class.java)
-                )
+                val type =
+                    Types.newParameterizedType(
+                        Map::class.java,
+                        String::class.java,
+                        Types.newParameterizedType(List::class.java, Song::class.java),
+                    )
 
                 val jsonAdapter: JsonAdapter<Map<String, List<Song>>> = moshi!!.adapter(type)
                 return jsonAdapter.fromJson(json) ?: emptyMap()
@@ -84,7 +76,6 @@ class StoragePrefrence {
         return emptyMap()
     }
 
-
     fun putLastPlayedMedia(media: List<Song>?) {
         val jsonAdapter =
             types?.let { moshi?.adapter<List<Song>>(it) }
@@ -92,7 +83,7 @@ class StoragePrefrence {
         sp!!.edit().putString("LastMediaItems", json).apply()
     }
 
-    fun getLastPlayedMedia():List<Song>{
+    fun getLastPlayedMedia(): List<Song>  {
         val json = sp!!.getString("LastMediaItems", null)
         if (json != null) {
             try {
@@ -104,9 +95,6 @@ class StoragePrefrence {
         }
         return mutableListOf()
     }
-
-
-
 
     fun getlastplayed(): MutableList<Song> {
         val json = sp!!.getString("lastsongdata", null)
@@ -121,10 +109,9 @@ class StoragePrefrence {
         return mutableListOf()
     }
 
-    fun clearsp(){
+    fun clearsp()  {
         sp!!.edit().clear().apply()
     }
-
 
     fun putsongdata(value: MutableList<Song>?) {
         val jsonAdapter =
@@ -145,5 +132,4 @@ class StoragePrefrence {
         }
         return mutableListOf()
     }
-
 }

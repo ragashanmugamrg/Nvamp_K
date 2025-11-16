@@ -13,15 +13,14 @@ import com.amp.nvamp.data.Song
 import com.amp.nvamp.databinding.FragmentArtistBinding
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByArtist
 
-
 class ArtistFragment : Fragment() {
-
     private lateinit var artistbinding: FragmentArtistBinding
     var artistListView: RecyclerView? = null
 
     companion object {
         private val deviceMusicList: MutableMap<String, List<Song>> = mutableMapOf()
         private lateinit var adapter: Artistlistadapter
+
         fun playernotify() {
             playernotifyadapter()
         }
@@ -36,8 +35,9 @@ class ArtistFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         artistbinding = FragmentArtistBinding.inflate(layoutInflater)
 

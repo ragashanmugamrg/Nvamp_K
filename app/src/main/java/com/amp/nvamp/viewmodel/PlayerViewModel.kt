@@ -7,18 +7,13 @@ import android.content.ContentUris
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.annotation.OptIn
-import androidx.core.net.toUri
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.amp.nvamp.NvampApplication
-import com.amp.nvamp.data.Album
 import com.amp.nvamp.data.Song
 import com.amp.nvamp.playback.PlaybackService
 import com.amp.nvamp.utils.NvampUtils
@@ -29,8 +24,6 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 class PlayerViewModel(application: Application) : AndroidViewModel(application) {
-
-
     private val storageRepo = StorageRepository(application)
 
     companion object {
@@ -47,16 +40,15 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         var playListMusic: Map<String, List<Song>> = mutableMapOf()
 
         var lastplayedposition: Int = 0
-
     }
 
-    val controllerFuture = MediaController.Builder(
-        application,
-        SessionToken(application, ComponentName(application, PlaybackService::class.java))
-    ).buildAsync()
+    val controllerFuture =
+        MediaController.Builder(
+            application,
+            SessionToken(application, ComponentName(application, PlaybackService::class.java)),
+        ).buildAsync()
 
     lateinit var controller: MediaController
-
 
     init {
         controllerFuture.addListener({
@@ -70,7 +62,6 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             dataIniziser()
         }
     }
-
 
     @OptIn(UnstableApi::class)
     suspend fun initialized() {
@@ -88,7 +79,6 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-
     @OptIn(UnstableApi::class)
     suspend fun dataIniziser() {
         val contentResolver: ContentResolver = NvampApplication.context.contentResolver
@@ -98,28 +88,30 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         var count = 0
 
         val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-        val projection = arrayOf(
-            MediaStore.Audio.Media.TITLE,
-            MediaStore.Audio.Media.ARTIST,
-            MediaStore.Audio.Media.DATA,
-            MediaStore.Audio.Media.ALBUM,
-            MediaStore.Audio.Media.ALBUM_ID,
-            MediaStore.Audio.Media._ID,
-            MediaStore.Audio.Media.DURATION,
-            MediaStore.Audio.Media.DISPLAY_NAME,
-            MediaStore.Audio.Media.YEAR,
-            MediaStore.Audio.Media.GENRE,
-            MediaStore.Audio.Media.ALBUM_ARTIST,
-            MediaStore.Audio.Media.DATE_ADDED,
-            MediaStore.Audio.Media.DATE_MODIFIED
-        )
-        val cursor = contentResolver.query(
-            uri,
-            projection,
-            selection,
-            null,
-            MediaStore.Audio.Media.DEFAULT_SORT_ORDER
-        )
+        val projection =
+            arrayOf(
+                MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media.ARTIST,
+                MediaStore.Audio.Media.DATA,
+                MediaStore.Audio.Media.ALBUM,
+                MediaStore.Audio.Media.ALBUM_ID,
+                MediaStore.Audio.Media._ID,
+                MediaStore.Audio.Media.DURATION,
+                MediaStore.Audio.Media.DISPLAY_NAME,
+                MediaStore.Audio.Media.YEAR,
+                MediaStore.Audio.Media.GENRE,
+                MediaStore.Audio.Media.ALBUM_ARTIST,
+                MediaStore.Audio.Media.DATE_ADDED,
+                MediaStore.Audio.Media.DATE_MODIFIED,
+            )
+        val cursor =
+            contentResolver.query(
+                uri,
+                projection,
+                selection,
+                null,
+                MediaStore.Audio.Media.DEFAULT_SORT_ORDER,
+            )
 
         songs.clear()
         mediaitems.clear()
@@ -149,41 +141,43 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
                     cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED))
 
                 val file = File(data)
-                if (adddate.equals(0))
+                if (adddate.equals(0)) {
                     adddate =
                         cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED))
+                }
 
                 val foldername = data.replace(display_name, "")
-
 
                 var lastmodifydate = file.lastModified()
 
                 val artworkUri = Uri.parse("content://media/external/audio/albumart")
-                val imgUri = ContentUris.withAppendedId(
-                    artworkUri,
-                    album_id
-                )
+                val imgUri =
+                    ContentUris.withAppendedId(
+                        artworkUri,
+                        album_id,
+                    )
 
                 count += 1
 
                 val pathFile = data?.let { it -> File(it) }
 
-                val song = Song(
-                    title,
-                    artist,
-                    duration,
-                    data,
-                    album,
-                    foldername,
-                    album_id,
-                    imgUri,
-                    year,
-                    gener ?: "Unknown",
-                    id,
-                    adddate,
-                    count,
-                    lastmodifydate
-                )
+                val song =
+                    Song(
+                        title,
+                        artist,
+                        duration,
+                        data,
+                        album,
+                        foldername,
+                        album_id,
+                        imgUri,
+                        year,
+                        gener ?: "Unknown",
+                        id,
+                        adddate,
+                        count,
+                        lastmodifydate,
+                    )
                 songs.add(song)
 
                 val mediaItem = NvampUtils().changeSongmodeltoMediaitem(song)
@@ -202,13 +196,11 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         deviceMusicByGener = songs.groupBy { it.gener ?: "Unknown" }
     }
 
-
-
-    fun putlastPlayedMediaItem(media: List<Song>){
+    fun putlastPlayedMediaItem(media: List<Song>)  {
         StoragePrefrence().putLastPlayedMedia(media)
     }
 
-    fun getlastPlayedMediaItem(): List<Song>{
+    fun getlastPlayedMediaItem(): List<Song>  {
         return StoragePrefrence().getLastPlayedMedia()
     }
 
@@ -229,7 +221,6 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         return lastplayedposition
     }
 
-
     fun setplayListMusic(playList: Map<String, List<Song>>) {
         viewModelScope.launch {
             StoragePrefrence().putplayListMusic(playList)
@@ -246,5 +237,4 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     fun saveDarkMode(mode: Int) {
         StoragePrefrence().saveMode(mode)
     }
-
 }

@@ -15,16 +15,18 @@ import com.google.common.util.concurrent.ListenableFuture
 
 class Folderlistadapter(
     private val folderitems: Map<String, List<Song>>,
-    private val medcontroller: ListenableFuture<MediaController>
+    private val medcontroller: ListenableFuture<MediaController>,
 ) :
     RecyclerView.Adapter<Folderlistadapter.MyViewHolder>() {
-
     inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val title: TextView = view.findViewById(R.id.title)
         val nooftracks: TextView = view.findViewById(R.id.nooftracks)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): MyViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.folder_card_view, parent, false)
         return MyViewHolder(view)
@@ -34,28 +36,33 @@ class Folderlistadapter(
         return folderitems.size
     }
 
-    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: MyViewHolder,
+        position: Int,
+    ) {
         val foldername = mutableListOf(folderitems.keys)
-        var splitname = foldername[0].elementAt(position)
-            .substring(0, foldername[0].elementAt(position).length - 1).split("/")
+        var splitname =
+            foldername[0].elementAt(position)
+                .substring(0, foldername[0].elementAt(position).length - 1).split("/")
         holder.title.text = splitname[splitname.size - 1]
         holder.nooftracks.text =
             folderitems.get(foldername[0].elementAt(position))?.size.toString() + " Items"
 
-        val bundle = Bundle().apply {
-            putInt("position", position)
-            putString("foldername", foldername[0].elementAt(position).toString())
-            putString("fromfragment", "folder")
-        }
-        val folderSongList = AlbumSongList().apply {
-            arguments = bundle
-        }
+        val bundle =
+            Bundle().apply {
+                putInt("position", position)
+                putString("foldername", foldername[0].elementAt(position).toString())
+                putString("fromfragment", "folder")
+            }
+        val folderSongList =
+            AlbumSongList().apply {
+                arguments = bundle
+            }
 
         holder.itemView.setOnClickListener {
             customFragmentManager.beginTransaction().replace(R.id.fragmentcontainer, folderSongList)
                 .addToBackStack(null)
                 .commit()
         }
-
     }
 }

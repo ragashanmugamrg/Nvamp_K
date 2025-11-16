@@ -13,16 +13,14 @@ import com.amp.nvamp.data.Song
 import com.amp.nvamp.databinding.FragmentPlaylistBinding
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByDate
 
-
 class PlaylistFragment : Fragment() {
-
     private lateinit var playlistbinding: FragmentPlaylistBinding
     var folderListView: RecyclerView? = null
-
 
     companion object {
         private val deviceMusicList: MutableMap<String, List<Song>> = mutableMapOf()
         private lateinit var adapter: Playlistadapter
+
         fun playernotify() {
             playernotifyadapter()
         }
@@ -40,10 +38,10 @@ class PlaylistFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
-
         val deviceMusicByPlaylist = playerViewModel.getplayListMusic()
 
         deviceMusicList.put("Recently Added", deviceMusicByDate)

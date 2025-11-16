@@ -30,10 +30,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
 
-
 class ViewPagerFragment : Fragment() {
-
-
     private lateinit var fragmentContainer: ViewPager2
     private lateinit var tabLayout: TabLayout
     private lateinit var toolbar: MaterialToolbar
@@ -51,17 +48,18 @@ class ViewPagerFragment : Fragment() {
         lateinit var loaderview: MaterialCardView
     }
 
-
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
-
         return inflater.inflate(R.layout.fragment_view_pager, container, false)
     }
 
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         tabLayout = view.findViewById(R.id.tab_layout)
         fragmentContainer = view.findViewById(R.id.fragmentcontainer)
@@ -86,20 +84,20 @@ class ViewPagerFragment : Fragment() {
         fragmentContainer.offscreenPageLimit = 6
 
         TabLayoutMediator(tabLayout, fragmentContainer) { tab, position ->
-            tab.text = when (position) {
-                0 -> "Songs"
-                1 -> "Albums"
-                2 -> "Folder"
-                3 -> "Artist"
-                4 -> "Gener"
-                5 -> "Playlist"
-                else -> "Unknown"
-            }
+            tab.text =
+                when (position) {
+                    0 -> "Songs"
+                    1 -> "Albums"
+                    2 -> "Folder"
+                    3 -> "Artist"
+                    4 -> "Gener"
+                    5 -> "Playlist"
+                    else -> "Unknown"
+                }
         }.attach()
 
         // 🔗 Connect search bar with search view
         searchView.setupWithSearchBar(searchBar)
-
 
         // 🔍 Handle search text changes
         searchView.editText.addTextChangedListener { text ->
@@ -123,16 +121,15 @@ class ViewPagerFragment : Fragment() {
             drawerLayout.openDrawer(GravityCompat.START)
         }
 
-
         // Handle menu item clicks
         navigationview.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.settingsd -> { /* Handle Home */
+                R.id.settingsd -> { // Handle Home
                     val settingsintent = Intent(context, NvampPlayerSettings::class.java)
                     startActivity(settingsintent)
                 }
 
-                R.id.refreshd -> { /* Handle Settings */
+                R.id.refreshd -> { // Handle Settings
                     lifecycleScope.launch {
                         loaderview.visibility = VISIBLE
                         MainActivity.playerViewModel.refreshdatainpref()
@@ -144,11 +141,10 @@ class ViewPagerFragment : Fragment() {
                         PlaylistFragment.playernotify()
                         loaderview.visibility = GONE
 
-
                         Snackbar.make(
                             view,
                             "All Songs Refreshed from disk",
-                            Snackbar.ANIMATION_MODE_FADE
+                            Snackbar.ANIMATION_MODE_FADE,
                         )
                             .show()
                     }
@@ -157,7 +153,6 @@ class ViewPagerFragment : Fragment() {
             drawerLayout.closeDrawer(GravityCompat.START)
             true
         }
-
 
 //        toolbar.setOnMenuItemClickListener { menuItem ->
 //            if (menuItem.title == "Refresh"){
@@ -195,6 +190,5 @@ class ViewPagerFragment : Fragment() {
 //
 //            return@setOnMenuItemClickListener false
 //        }
-
     }
 }

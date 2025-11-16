@@ -13,14 +13,12 @@ import com.amp.nvamp.data.Song
 import com.amp.nvamp.databinding.FragmentFolderBinding
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByFolder
 
-
 class FolderFragment : Fragment() {
-
-
     companion object {
         var folderListView: RecyclerView? = null
         val deviceMusicList: MutableMap<String, List<Song>> = mutableMapOf()
         private lateinit var adapter: Folderlistadapter
+
         fun playernotify() {
             playernotifyadapter()
         }
@@ -37,10 +35,10 @@ class FolderFragment : Fragment() {
     var folderbinding: FragmentFolderBinding? = null
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
-
         folderbinding = FragmentFolderBinding.inflate(layoutInflater)
 
         folderListView = folderbinding?.foldersongrecyclerview
@@ -48,7 +46,6 @@ class FolderFragment : Fragment() {
         folderListView?.layoutManager = layoutManager
         adapter = Folderlistadapter(deviceMusicList, playerViewModel.controllerFuture)
         folderListView?.adapter = adapter
-
 
         return folderbinding!!.root
     }

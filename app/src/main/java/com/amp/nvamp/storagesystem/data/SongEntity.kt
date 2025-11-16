@@ -1,8 +1,6 @@
 package com.amp.nvamp.storagesystem.data
 
 import android.net.Uri
-import androidx.annotation.NonNull
-import androidx.annotation.Nullable
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -13,7 +11,7 @@ import androidx.room.Relation
 import com.amp.nvamp.data.Song
 
 @Entity(
-    tableName = "songs"
+    tableName = "songs",
 )
 data class SongEntity(
     val title: String,
@@ -29,7 +27,7 @@ data class SongEntity(
     @PrimaryKey val id: String,
     val date: Int?,
     val count: Int?,
-    val last_modifiy_dt: Long?
+    val last_modifiy_dt: Long?,
 )
 
 fun Song.toEntity(): SongEntity {
@@ -47,19 +45,15 @@ fun Song.toEntity(): SongEntity {
         gener = this.gener ?: "",
         date = this.date ?: 0,
         count = this.count ?: 0,
-        last_modifiy_dt = this.lastmodifiydate ?: 0L
+        last_modifiy_dt = this.lastmodifiydate ?: 0L,
     )
 }
-
-
-
 
 @Entity(tableName = "playlist", indices = [Index(value = ["playlistname"], unique = true)])
 data class PlaylistEntity(
     @PrimaryKey(autoGenerate = true) val playlistid: Int = 0,
     val playlistname: String,
 )
-
 
 @Entity(
     tableName = "playlist_cross_ref",
@@ -69,29 +63,29 @@ data class PlaylistEntity(
             entity = PlaylistEntity::class,
             parentColumns = ["playlistid"],
             childColumns = ["playlistid"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.CASCADE,
         ),
         ForeignKey(
             entity = SongEntity::class,
             parentColumns = ["id"],
             childColumns = ["id"],
-            onDelete = ForeignKey.CASCADE
-        )
-    ]
+            onDelete = ForeignKey.CASCADE,
+        ),
+    ],
 )
 data class PlaylistCrossRef(
     val playlistid: Int,
-    val id: String
+    val id: String,
 )
-
 
 data class PlaylistWithsongs(
     @Embedded val playlist: PlaylistEntity,
-    @Relation(parentColumn = "playlistid",
+    @Relation(
+        parentColumn = "playlistid",
         entityColumn = "id",
-        associateBy = Junction(PlaylistCrossRef::class)
+        associateBy = Junction(PlaylistCrossRef::class),
     )
-    val playlists: List<SongEntity>
+    val playlists: List<SongEntity>,
 )
 
 @Entity(tableName = "lastplayed")
@@ -99,5 +93,5 @@ data class lastPlayedEntity(
     @PrimaryKey(autoGenerate = true) val uid: Int = 0,
     val lastplayedsongs: SongEntity,
     val lastplayedsong: Int,
-    val lastplayedpos: Long
+    val lastplayedpos: Long,
 )

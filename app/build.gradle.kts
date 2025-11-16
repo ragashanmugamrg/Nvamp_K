@@ -2,8 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
 
-    //ksp annotation process
+    // ksp annotation process
     id("com.google.devtools.ksp") version "1.9.22-1.0.17"
+
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
 }
 
 android {
@@ -25,7 +27,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -34,10 +36,9 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
-    buildFeatures{
+    buildFeatures {
         viewBinding = true
     }
-
 
     kotlinOptions {
         jvmTarget = "1.8"
@@ -64,8 +65,6 @@ dependencies {
     implementation(libs.moshi)
     implementation("com.squareup.moshi:moshi-kotlin:1.15.2")
 
-
-
     // Room components
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
@@ -73,6 +72,5 @@ dependencies {
     ksp("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-paging:2.6.1")
 
-    //----------
-
+    // ----------
 }

@@ -10,11 +10,11 @@ import com.amp.nvamp.fragments.HomeFragment
 import com.amp.nvamp.fragments.MusicLibrary
 import com.amp.nvamp.fragments.PlaylistFragment
 
-class TabLayout(fragment: FragmentActivity): FragmentStateAdapter(fragment) {
+class TabLayout(fragment: FragmentActivity) : FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int = 6
 
     override fun createFragment(position: Int): Fragment {
-        when(position){
+        when (position) {
             0 -> return HomeFragment()
             1 -> return MusicLibrary()
             2 -> return FolderFragment()
@@ -22,7 +22,6 @@ class TabLayout(fragment: FragmentActivity): FragmentStateAdapter(fragment) {
             4 -> return GenerFragment()
             5 -> return PlaylistFragment()
             else -> return throw IllegalStateException("Hello....")
-
         }
     }
 }

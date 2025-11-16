@@ -15,7 +15,6 @@ import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByAlbum
 
 class
 MusicLibrary : Fragment() {
-
     companion object {
         var libraryListView: RecyclerView? = null
         private lateinit var adapter: Albumlistadapter
@@ -35,13 +34,12 @@ MusicLibrary : Fragment() {
         }
     }
 
-
     var homebinding: FragmentMusicLibraryBinding? = null
 
-
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
         homebinding = FragmentMusicLibraryBinding.inflate(inflater)
 

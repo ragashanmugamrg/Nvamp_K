@@ -15,53 +15,54 @@ class StorageRepository(context: Context) {
     private val db = DatabaseProvider.getInstance(context)
     private val songDao = db.songDao()
     private val playlistDao = db.playlistDao()
-    //private val db = DatabaseProvider.getInstance(context)
+    // private val db = DatabaseProvider.getInstance(context)
 
-
-    suspend fun saveAllSongs(songs: List<Song>) = withContext(Dispatchers.IO) {
-        val entities = songs.map {
-            SongEntity(
-                title = it.title,
-                artist = it.artist,
-                duration = it.duration,
-                data = it.data,
-                album = it.album,
-                folder_name = it.foldername,
-                album_id = it.album_id,
-                imgUri = it.imgUri,
-                year = it.year,
-                gener = it.gener,
-                id = it.id,
-                date = it.date,
-                count = it.count,
-                last_modifiy_dt = it.lastmodifiydate
-            )
+    suspend fun saveAllSongs(songs: List<Song>) =
+        withContext(Dispatchers.IO) {
+            val entities =
+                songs.map {
+                    SongEntity(
+                        title = it.title,
+                        artist = it.artist,
+                        duration = it.duration,
+                        data = it.data,
+                        album = it.album,
+                        folder_name = it.foldername,
+                        album_id = it.album_id,
+                        imgUri = it.imgUri,
+                        year = it.year,
+                        gener = it.gener,
+                        id = it.id,
+                        date = it.date,
+                        count = it.count,
+                        last_modifiy_dt = it.lastmodifiydate,
+                    )
+                }
+            songDao.deleteAlltheSongs()
+            songDao.insertAllSongs(entities)
         }
-        songDao.deleteAlltheSongs()
-        songDao.insertAllSongs(entities)
-    }
 
-    suspend fun getAllSongs(): List<Song> = withContext(Dispatchers.IO) {
-        songDao.getAllSongs().map {
-            Song(
-                title = it.title,
-                artist = it.artist,
-                duration = it.duration,
-                data = it.data,
-                album = it.album,
-                foldername = it.folder_name,
-                album_id = it.album_id,
-                imgUri = it.imgUri,
-                year = it.year,
-                gener = it.gener,
-                id = it.id,
-                date = it.date,
-                count = it.count,
-                lastmodifiydate = it.last_modifiy_dt
-            )
+    suspend fun getAllSongs(): List<Song> =
+        withContext(Dispatchers.IO) {
+            songDao.getAllSongs().map {
+                Song(
+                    title = it.title,
+                    artist = it.artist,
+                    duration = it.duration,
+                    data = it.data,
+                    album = it.album,
+                    foldername = it.folder_name,
+                    album_id = it.album_id,
+                    imgUri = it.imgUri,
+                    year = it.year,
+                    gener = it.gener,
+                    id = it.id,
+                    date = it.date,
+                    count = it.count,
+                    lastmodifiydate = it.last_modifiy_dt,
+                )
+            }
         }
-    }
-
 
     suspend fun savealltheplaylist(playlist: Map<String, List<Song>>) =
         withContext(Dispatchers.IO) {
@@ -73,18 +74,20 @@ class StorageRepository(context: Context) {
                 playlistDao.insertSongs(songEntities)
 
                 // Insert the playlist and get its ID
-                val playlistId = playlistDao.insertPlayList(
-                    PlaylistEntity(playlistname = playlistName)
-                ).toInt()
+                val playlistId =
+                    playlistDao.insertPlayList(
+                        PlaylistEntity(playlistname = playlistName),
+                    ).toInt()
 
                 // Only create cross references if playlist was successfully created
                 if (playlistId > 0) {
-                    val crossRefs = songEntities.map { song ->
-                        PlaylistCrossRef(
-                            playlistid = playlistId,
-                            id = song.id
-                        )
-                    }
+                    val crossRefs =
+                        songEntities.map { song ->
+                            PlaylistCrossRef(
+                                playlistid = playlistId,
+                                id = song.id,
+                            )
+                        }
                     playlistDao.insertPlaylistCrossref(crossRefs)
                 }
             }
@@ -94,10 +97,10 @@ class StorageRepository(context: Context) {
         withContext(Dispatchers.IO) {
             val playlists = playlistDao.getPlayListWithSongs()
             playlists.associate { playlistWithSongs ->
-                playlistWithSongs.playlist.playlistname to playlistWithSongs.playlists.map {
-                    it.toSongs()
-                }
+                playlistWithSongs.playlist.playlistname to
+                    playlistWithSongs.playlists.map {
+                        it.toSongs()
+                    }
             }
         }
-
 }

@@ -1,6 +1,5 @@
 package com.amp.nvamp.bottombar
 
-
 import android.content.Context
 import android.content.DialogInterface
 import android.net.Uri
@@ -26,7 +25,6 @@ import com.amp.nvamp.R
 import com.amp.nvamp.data.Song
 import com.amp.nvamp.fragments.PlaylistFragment
 import com.amp.nvamp.utils.NvampUtils
-import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.mediaitems
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.target.Target
@@ -39,10 +37,8 @@ import com.google.android.material.slider.Slider
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 
-
 class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
     ConstraintLayout(context, attribute) {
-
     lateinit var bottomSheet: BottomSheetBehavior<ConstraintLayout>
 
     var main = MainActivity()
@@ -75,11 +71,10 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
 
     var appBar: MaterialToolbar
 
-
     lateinit var mediaController: ListenableFuture<MediaController>
     lateinit var controller: MediaController
 
-    val playlistmap = mutableMapOf<String,List<Song>>()
+    val playlistmap = mutableMapOf<String, List<Song>>()
     val dynamicChoice: Set<String> = playlistmap.keys
 
     private var isPlayerListenerAdded = false
@@ -113,55 +108,58 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
         playlistmap.putAll(playerViewModel.getplayListMusic())
 
         val handler = Handler(Looper.getMainLooper())
-
     }
 
+    var bottomSheetCallback: BottomSheetBehavior.BottomSheetCallback =
+        object :
+            BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(
+                bottomSheet: View,
+                newState: Int,
+            ) {
+                when (newState) {
+                    BottomSheetBehavior.STATE_COLLAPSED -> miniplayerview.visibility = VISIBLE
 
-    var bottomSheetCallback: BottomSheetBehavior.BottomSheetCallback = object :
-        BottomSheetBehavior.BottomSheetCallback() {
+                    BottomSheetBehavior.STATE_EXPANDED -> miniplayerview.visibility = GONE
 
-        override fun onStateChanged(bottomSheet: View, newState: Int) {
-            when (newState) {
+                    BottomSheetBehavior.STATE_HALF_EXPANDED -> miniplayerview.visibility = GONE
 
-                BottomSheetBehavior.STATE_COLLAPSED -> miniplayerview.visibility = VISIBLE
+                    BottomSheetBehavior.STATE_DRAGGING -> miniplayerview.visibility = GONE
+                }
+            }
 
-                BottomSheetBehavior.STATE_EXPANDED -> miniplayerview.visibility = GONE
-
-                BottomSheetBehavior.STATE_HALF_EXPANDED -> miniplayerview.visibility = GONE
-
-                BottomSheetBehavior.STATE_DRAGGING -> miniplayerview.visibility = GONE
-
+            override fun onSlide(
+                bottomSheet: View,
+                slideOffset: Float,
+            ) {
+                if (slideOffset < 0) {
+                    miniplayerview.alpha = 1 - (-1 * slideOffset)
+                    return
+                }
             }
         }
 
-        override fun onSlide(bottomSheet: View, slideOffset: Float) {
-            if (slideOffset < 0) {
-                miniplayerview.alpha = 1 - (-1 * slideOffset)
-                return
+    var seekbarplayer =
+        object : Runnable {
+            override fun run() {
+                if (controller.isPlaying) {
+                    slider.value = controller.currentPosition.toFloat()
+                }
+                ahandler.postDelayed(this, 100)
             }
         }
-    }
 
-    var seekbarplayer = object : Runnable {
-        override fun run() {
-            if (controller.isPlaying) {
-                slider.value = controller.currentPosition.toFloat()
+    var sliderTouchListener =
+        object : Slider.OnSliderTouchListener {
+            override fun onStartTrackingTouch(slider: Slider) {
             }
-            ahandler.postDelayed(this, 100)
-        }
-    }
 
-
-    var sliderTouchListener = object : Slider.OnSliderTouchListener {
-        override fun onStartTrackingTouch(slider: Slider) {
-        }
-
-        override fun onStopTrackingTouch(slider: Slider) {
-            if (controller.currentMediaItem != null) {
-                controller.seekTo(((slider.value).toLong()))
+            override fun onStopTrackingTouch(slider: Slider) {
+                if (controller.currentMediaItem != null) {
+                    controller.seekTo(((slider.value).toLong()))
+                }
             }
         }
-    }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -183,7 +181,7 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
                 if (mediaController.isDone) {
                     controller = mediaController.get()
 
-                    //controller.setMediaItems(mediaitems, playerViewModel.getlastplayedpos(),playerViewModel.getLastPlayedms().toLong())
+                    // controller.setMediaItems(mediaitems, playerViewModel.getlastplayedpos(),playerViewModel.getLastPlayedms().toLong())
 
 //                    val lastIndex = playerViewModel.getlastplayedpos()
 //                    val lastMs = playerViewModel.getLastPlayedms()
@@ -192,41 +190,45 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
 //                    controller.prepare()
 //                    controller.seekTo(lastIndex, lastMs.toLong())
 
-                    if(!isPlayerListenerAdded) {
-
+                    if (!isPlayerListenerAdded) {
                         isPlayerListenerAdded = true
 
-                        controller.addListener(object : Player.Listener {
-                            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                                super.onIsPlayingChanged(isPlaying)
-                                onPlaybackStateChanged(controller.playbackState)
-                                if(isPlaying)
-                                    ahandler.post(seekbarplayer)
-                            }
+                        controller.addListener(
+                            object : Player.Listener {
+                                override fun onIsPlayingChanged(isPlaying: Boolean) {
+                                    super.onIsPlayingChanged(isPlaying)
+                                    onPlaybackStateChanged(controller.playbackState)
+                                    if (isPlaying) {
+                                        ahandler.post(seekbarplayer)
+                                    }
+                                }
 
-                            override fun onPlaybackStateChanged(playbackState: Int) {
-                                super.onPlaybackStateChanged(playbackState)
-                                updateplaying()
-                            }
+                                override fun onPlaybackStateChanged(playbackState: Int) {
+                                    super.onPlaybackStateChanged(playbackState)
+                                    updateplaying()
+                                }
 
-                            override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
-                                super.onMediaMetadataChanged(mediaMetadata)
-                                slider.value = playerViewModel.getLastPlayedms() ?: 0f
-                                updatemetadata(mediaMetadata)
-                            }
+                                override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
+                                    super.onMediaMetadataChanged(mediaMetadata)
+                                    slider.value = playerViewModel.getLastPlayedms() ?: 0f
+                                    updatemetadata(mediaMetadata)
+                                }
 
-                            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-                                super.onMediaItemTransition(mediaItem, reason)
-                                slider.valueFrom = 0f
-                                ahandler.postDelayed(seekbarplayer, 500)
-                            }
-
-                        })
+                                override fun onMediaItemTransition(
+                                    mediaItem: MediaItem?,
+                                    reason: Int,
+                                ) {
+                                    super.onMediaItemTransition(mediaItem, reason)
+                                    slider.valueFrom = 0f
+                                    ahandler.postDelayed(seekbarplayer, 500)
+                                }
+                            },
+                        )
                     }
                 }
-            }, MoreExecutors.directExecutor()
+            },
+            MoreExecutors.directExecutor(),
         )
-
 
         if (mediaController.isDone) {
             controller = mediaController.get()
@@ -236,29 +238,28 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
 
         miniplayerview.measure(
             MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
-            MeasureSpec.UNSPECIFIED
+            MeasureSpec.UNSPECIFIED,
         )
-
 
         bottomSheet.setPeekHeight(miniplayerview.measuredHeight, false)
 
-
         minplayerplaypause.setOnClickListener {
             if (mediaController.isDone) {
-                if (controller.isPlaying)
+                if (controller.isPlaying) {
                     controller.pause()
-                else if (!controller.isPlaying)
+                } else if (!controller.isPlaying) {
                     controller.play()
+                }
             }
         }
 
-
         playpause.setOnClickListener {
             if (mediaController.isDone) {
-                if (controller.isPlaying)
+                if (controller.isPlaying) {
                     controller.pause()
-                else if (!controller.isPlaying)
+                } else if (!controller.isPlaying) {
                     controller.play()
+                }
                 updateplaying()
             }
         }
@@ -280,15 +281,12 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
                     controller.shuffleModeEnabled = false
                 }
 
-
                 false -> {
                     shuffleMode.setIconResource(R.drawable.shuffle_on_24px)
                     controller.shuffleModeEnabled = true
                 }
             }
         }
-
-
 
         repeatMode.setOnClickListener {
             when (controller.repeatMode) {
@@ -306,23 +304,20 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
                     repeatMode.setIconResource(R.drawable.repeat_24px)
                     controller.repeatMode = Player.REPEAT_MODE_OFF
                 }
-
             }
         }
 
-
         slider.addOnSliderTouchListener(sliderTouchListener)
 
-        slider.addOnChangeListener(Slider.OnChangeListener { slider, value, fromUser ->
-            leftduration.text = NvampUtils().formatDuration(value.toLong())
-        })
+        slider.addOnChangeListener(
+            Slider.OnChangeListener { slider, value, fromUser ->
+                leftduration.text = NvampUtils().formatDuration(value.toLong())
+            },
+        )
 
         appBar.setNavigationOnClickListener {
             bottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
         }
-
-
-
 
         appBar.setOnMenuItemClickListener { item ->
 
@@ -344,25 +339,26 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
                             }
                             .setPositiveButton("ok") { dialog, which ->
                                 val playlistname = editText.text
-                                val playlist = Song(
-                                controller.mediaMetadata.title.toString(),
-                                controller.mediaMetadata.artist.toString(),
-                                controller.duration,
-                                    controller.mediaMetadata.description.toString(),
-                                "",
-                                "",
-                                0L,
-                                controller.mediaMetadata.artworkUri!!,
-                                "",
-                                "",
-                                    controller.mediaMetadata.description.toString(),
-                                0,
-                                    0,
-                                    0L
-                            )
+                                val playlist =
+                                    Song(
+                                        controller.mediaMetadata.title.toString(),
+                                        controller.mediaMetadata.artist.toString(),
+                                        controller.duration,
+                                        controller.mediaMetadata.description.toString(),
+                                        "",
+                                        "",
+                                        0L,
+                                        controller.mediaMetadata.artworkUri!!,
+                                        "",
+                                        "",
+                                        controller.mediaMetadata.description.toString(),
+                                        0,
+                                        0,
+                                        0L,
+                                    )
                                 var newplaylist = mutableListOf<Song>()
                                 newplaylist.add(playlist)
-                                playlistmap.put(playlistname.toString(),newplaylist)
+                                playlistmap.put(playlistname.toString(), newplaylist)
                                 playerViewModel.setplayListMusic(playlistmap)
                                 PlaylistFragment.playernotify()
                             }
@@ -371,37 +367,39 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
                     .setNegativeButton("cancle") { dialog, which ->
                         dialog.dismiss()
                     }
-                    .setPositiveButton("ok",{ dialog: DialogInterface?, which: Int ->
+                    .setPositiveButton("ok", { dialog: DialogInterface?, which: Int ->
                         PlaylistFragment.playernotify()
-                        })
-                    .setMultiChoiceItems(playlistnames.toTypedArray(),null,){ dialog,which,ischecked ->
+                    })
+                    .setMultiChoiceItems(playlistnames.toTypedArray(), null) { dialog, which, ischecked ->
                         val selectedItem = playlistnames[which]
-                        if(ischecked) {
-                            val playlist = Song(
-                                controller.mediaMetadata.title.toString(),
-                                controller.mediaMetadata.artist.toString(),
-                                controller.duration,
-                                controller.mediaMetadata.description.toString(),
-                                "",
-                                "",
-                                0L,
-                                controller.mediaMetadata.artworkUri!!,
-                                "",
-                                "",
-                                controller.mediaMetadata.description.toString(),
-                                0,
-                                0,
-                                0L
-                            )
+                        if (ischecked) {
+                            val playlist =
+                                Song(
+                                    controller.mediaMetadata.title.toString(),
+                                    controller.mediaMetadata.artist.toString(),
+                                    controller.duration,
+                                    controller.mediaMetadata.description.toString(),
+                                    "",
+                                    "",
+                                    0L,
+                                    controller.mediaMetadata.artworkUri!!,
+                                    "",
+                                    "",
+                                    controller.mediaMetadata.description.toString(),
+                                    0,
+                                    0,
+                                    0L,
+                                )
                             var newplaylist = mutableListOf<Song>()
                             val play = playlistmap.get(selectedItem)?.toMutableList()
-                            if (play!=null){
-                                play.forEach { data ->
-                                    newplaylist.add(data)
+                            if (play != null)
+                                {
+                                    play.forEach { data ->
+                                        newplaylist.add(data)
+                                    }
                                 }
-                            }
                             newplaylist.add(playlist)
-                            playlistmap.put(selectedItem,newplaylist)
+                            playlistmap.put(selectedItem, newplaylist)
                             playerViewModel.setplayListMusic(playlistmap)
                         }
                     }
@@ -412,19 +410,16 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
                 return@setOnMenuItemClickListener false
             }
         }
-
     }
-
 
     @OptIn(UnstableApi::class)
     fun updatemetadata(mediaMetadata: MediaMetadata) {
-
-
         val albumId = mediaMetadata.extras?.getLong("ALBUM_ID")
 
-        val highResUri = albumId?.let {
-            Uri.parse("content://media/external/audio/albumart/$albumId")
-        }
+        val highResUri =
+            albumId?.let {
+                Uri.parse("content://media/external/audio/albumart/$albumId")
+            }
 
         title.text = mediaMetadata.title
         artist.text = mediaMetadata.artist
@@ -449,7 +444,6 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
         slider.valueTo = mediaMetadata.durationMs?.toFloat() ?: 0f
 
         playerViewModel.setlastplayedpos(controller.currentMediaItemIndex)
-
     }
 
     fun updateplaying() {
@@ -461,6 +455,4 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
             playpause.setIconResource(R.drawable.play_arrow_40px)
         }
     }
-
-
 }

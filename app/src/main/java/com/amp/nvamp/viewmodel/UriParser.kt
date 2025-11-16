@@ -5,7 +5,6 @@ import com.squareup.moshi.FromJson
 import com.squareup.moshi.ToJson
 
 class UriParser {
-
     @FromJson
     fun fromJson(uri: String?): Uri? {
         return if (uri != null) Uri.parse(uri) else null

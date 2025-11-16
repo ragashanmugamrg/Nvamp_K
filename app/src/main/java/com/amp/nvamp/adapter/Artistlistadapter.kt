@@ -15,19 +15,17 @@ import com.google.common.util.concurrent.ListenableFuture
 
 class Artistlistadapter(
     private val artistitems: Map<String, List<Song>>,
-    private val medcontroller: ListenableFuture<MediaController>
+    private val medcontroller: ListenableFuture<MediaController>,
 ) :
     RecyclerView.Adapter<Artistlistadapter.MyViewHolder>() {
-
     inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val title: TextView = view.findViewById(R.id.title)
         val nooftracks: TextView = view.findViewById(R.id.nooftracks)
     }
 
-
     override fun onCreateViewHolder(
         parent: ViewGroup,
-        viewType: Int
+        viewType: Int,
     ): MyViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.artist_card_view, parent, false)
@@ -38,20 +36,25 @@ class Artistlistadapter(
         return artistitems.size
     }
 
-    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: MyViewHolder,
+        position: Int,
+    ) {
         var foldername = mutableListOf(artistitems.keys)
         var folder = foldername[0].sorted()
         holder.title.text = folder[position]
         holder.nooftracks.text = artistitems.get(folder[position])?.size.toString() + " Items"
 
-        val bundle = Bundle().apply {
-            putInt("position", position)
-            putString("artistname", folder[position])
-            putString("fromfragment", "artist")
-        }
-        val folderSongList = AlbumSongList().apply {
-            arguments = bundle
-        }
+        val bundle =
+            Bundle().apply {
+                putInt("position", position)
+                putString("artistname", folder[position])
+                putString("fromfragment", "artist")
+            }
+        val folderSongList =
+            AlbumSongList().apply {
+                arguments = bundle
+            }
 
         holder.itemView.setOnClickListener {
             customFragmentManager.beginTransaction().replace(R.id.fragmentcontainer, folderSongList)

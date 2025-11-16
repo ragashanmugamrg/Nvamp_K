@@ -14,7 +14,6 @@ import com.amp.nvamp.databinding.FragmentHomeBinding
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.mediaitems
 
 class HomeFragment : Fragment() {
-
     companion object {
         var libraryListView: RecyclerView? = null
         lateinit var adapter: Songslistadapter
@@ -33,12 +32,12 @@ class HomeFragment : Fragment() {
         }
     }
 
-
     var homebinding: FragmentHomeBinding? = null
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? {
         homebinding = FragmentHomeBinding.inflate(inflater)
         libraryListView = homebinding?.recyclerview
@@ -49,5 +48,4 @@ class HomeFragment : Fragment() {
 
         return homebinding?.root
     }
-
 }

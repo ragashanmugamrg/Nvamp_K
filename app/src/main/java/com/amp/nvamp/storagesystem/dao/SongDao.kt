@@ -8,7 +8,6 @@ import com.amp.nvamp.storagesystem.data.SongEntity
 
 @Dao
 interface SongDao {
-
     @Query("SELECT * FROM songs")
     suspend fun getAllSongs(): List<SongEntity>
 

@@ -6,17 +6,17 @@ import androidx.core.os.bundleOf
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
-import com.amp.nvamp.MainActivity.Companion.playerViewModel
 import com.amp.nvamp.data.Song
 import java.io.File
 import java.util.concurrent.TimeUnit
 
 class NvampUtils {
-
     fun formatDuration(duration: Long): String {
         val minutes: Long = TimeUnit.MINUTES.convert(duration, TimeUnit.MILLISECONDS)
-        val seconds: Long = (TimeUnit.SECONDS.convert(duration, TimeUnit.MILLISECONDS)
-                - minutes * TimeUnit.SECONDS.convert(1, TimeUnit.MINUTES))
+        val seconds: Long = (
+            TimeUnit.SECONDS.convert(duration, TimeUnit.MILLISECONDS) -
+                minutes * TimeUnit.SECONDS.convert(1, TimeUnit.MINUTES)
+        )
         return String.format("%02d:%02d", minutes, seconds)
     }
 
@@ -34,10 +34,10 @@ class NvampUtils {
                     .setDescription(data.data)
                     .setExtras(
                         bundleOf(
-                            "ALBUM_ID" to data.album_id
-                        )
+                            "ALBUM_ID" to data.album_id,
+                        ),
                     )
-                    .build()
+                    .build(),
             )
     }
 }

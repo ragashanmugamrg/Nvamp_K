@@ -13,15 +13,14 @@ import com.amp.nvamp.data.Song
 import com.amp.nvamp.databinding.FragmentGenerBinding
 import com.amp.nvamp.viewmodel.PlayerViewModel.Companion.deviceMusicByGener
 
-
 class GenerFragment : Fragment() {
-
     private lateinit var generbinding: FragmentGenerBinding
     var generListView: RecyclerView? = null
 
     companion object {
         private val deviceMusicList: MutableMap<String, List<Song>> = mutableMapOf()
         private lateinit var adapter: Generlistadapter
+
         fun playernotify() {
             playernotifyadapter()
         }
@@ -36,8 +35,9 @@ class GenerFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         generbinding = FragmentGenerBinding.inflate(layoutInflater)
 
