@@ -443,7 +443,7 @@ class PlayerBottomSheet(context: Context, attribute: AttributeSet) :
 
         slider.valueTo = mediaMetadata.durationMs?.toFloat() ?: 0f
 
-        playerViewModel.setlastplayedpos(controller.currentMediaItemIndex)
+        //playerViewModel.setlastplayedpos(controller.currentMediaItemIndex)
     }
 
     fun updateplaying() {
